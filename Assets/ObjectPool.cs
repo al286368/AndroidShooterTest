@@ -6,12 +6,15 @@ public class ObjectPool : MonoBehaviour {
 
     [Header("Prefabs")]
     public GameObject prefab_bullets;
+    public GameObject prefab_beams;
     [Header("Object Group Parent")]
     public Transform parent_bullets;
+    public Transform parent_beams;
 
     private List<BulletBehaviour> pool_bullets;
+    private List<BeamBehaviour> pool_beams;
 
-    private const int BASE_POOL_SIZE = 20;
+    private const int BASE_POOL_SIZE = 10;
 
     public static ObjectPool currentInstance;
 
@@ -24,13 +27,21 @@ public class ObjectPool : MonoBehaviour {
     private void InitializeObjectPools()
     {
         GameObject lastInstantiatedObject;
-        pool_bullets = new List<BulletBehaviour>();
 
+        pool_bullets = new List<BulletBehaviour>();
         for (int i = 0; i < BASE_POOL_SIZE; i++)
         {
             lastInstantiatedObject = Instantiate(prefab_bullets, parent_bullets) as GameObject;
             lastInstantiatedObject.gameObject.SetActive(false);
             pool_bullets.Add(lastInstantiatedObject.GetComponent<BulletBehaviour>());
+        }
+
+        pool_beams = new List<BeamBehaviour>();
+        for (int i = 0; i < BASE_POOL_SIZE; i++)
+        {
+            lastInstantiatedObject = Instantiate(prefab_beams, parent_beams) as GameObject;
+            lastInstantiatedObject.gameObject.SetActive(false);
+            pool_beams.Add(lastInstantiatedObject.GetComponent<BeamBehaviour>());
         }
     }
     #endregion
@@ -49,6 +60,20 @@ public class ObjectPool : MonoBehaviour {
         lastInstantiatedObject.gameObject.SetActive(false);
         pool_bullets.Add(lastInstantiatedObject.GetComponent<BulletBehaviour>());
         return lastInstantiatedObject.GetComponent<BulletBehaviour>();
+    }
+    public BeamBehaviour GetBeamFromPool()
+    {
+        for (int i = 0; i < pool_beams.Count; i++)
+        {
+            if (!pool_beams[i].gameObject.activeInHierarchy)
+            {
+                return pool_beams[i];
+            }
+        }
+        GameObject lastInstantiatedObject = Instantiate(prefab_beams, parent_beams) as GameObject;
+        lastInstantiatedObject.gameObject.SetActive(false);
+        pool_beams.Add(lastInstantiatedObject.GetComponent<BeamBehaviour>());
+        return lastInstantiatedObject.GetComponent<BeamBehaviour>();
     }
     #endregion
 }
