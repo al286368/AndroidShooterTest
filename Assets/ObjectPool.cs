@@ -7,9 +7,11 @@ public class ObjectPool : MonoBehaviour {
     [Header("Prefabs")]
     public GameObject prefab_bullets;
     public GameObject prefab_beams;
+    public GameObject prefab_explosions;
     [Header("Object Group Parent")]
     public Transform parent_bullets;
     public Transform parent_beams;
+    public Transform parent_explosions;
 
     private List<BulletBehaviour> pool_bullets;
     private List<BeamBehaviour> pool_beams;
