@@ -1199,11 +1199,11 @@ MonoBehaviour:
   stat_health: 0
   stat_shield: 0
   stat_defense: 0
-  stat_damage_physical: 0
-  stat_damage_cryo: 0
-  stat_damage_photon: 100
-  stat_damage_electric: 0
-  stat_damage_nuclear: 0
+  stat_damage_physical: 100
+  stat_damage_cryo: 10
+  stat_damage_photon: 10
+  stat_damage_electric: 10
+  stat_damage_nuclear: 10
   stat_effectiveness: 0
   stat_critChance: 0
   stat_critMultiplier: 0
@@ -1212,12 +1212,12 @@ MonoBehaviour:
   stat_trajectoryHelix: 0
   stat_trajectoryArc: 0
   stat_bounces: 5
-  weapon_multishoot: 4
+  weapon_multishoot: 1
   weapon_multishootArc: 160
-  weapon_randomSpread: 0
+  weapon_randomSpread: 5
   weapon_attackType: 0
   weapon_element: 0
-  weapon_shootSecuenceType: 0
+  weapon_shootSecuenceType: 1
   entity_hitbox: {fileID: 1054705964}
 --- !u!61 &1054705964
 BoxCollider2D:

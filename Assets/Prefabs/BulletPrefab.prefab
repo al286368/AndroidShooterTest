@@ -304,6 +304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentDegree: 10
+  lr: 0
   trail: {fileID: 114698812345007060}
   hitboxParent: {fileID: 4152467496727534}
 --- !u!198 &198930693420224890

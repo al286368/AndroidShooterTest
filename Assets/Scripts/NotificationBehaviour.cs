@@ -56,6 +56,7 @@ public class NotificationBehaviour : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         transform.Translate(horizontalSpeed * Time.deltaTime, verticalSpeed * Time.deltaTime, 0);
+		verticalSpeed -= 0.1f * Screen.height * Time.deltaTime;
 	}
     IEnumerator AnimationNoCrit()
     {
@@ -67,7 +68,7 @@ public class NotificationBehaviour : MonoBehaviour {
             transform.localScale = Vector3.one * (t + 1f);
             yield return null;
         }
-        while (t > 0)
+        while (t > -0.25f)
         {
             t -= Time.deltaTime * animspeed;
             transform.localScale = Vector3.one * (t + 1f);
