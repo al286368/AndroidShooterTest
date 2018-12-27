@@ -10,13 +10,24 @@ public class NotificationBehaviour : MonoBehaviour {
     private float horizontalSpeed = 0;
     private float verticalSpeed = 0;
 
-    public void SetAs(float dmg, Enums.DamageType type, Vector3 worldpos)
+    public void SetAsDamage(float dmg, Enums.DamageType type, Vector3 worldpos)
     {
         notificationText.text = ((int)dmg).ToString();
         transform.position = Camera.main.WorldToScreenPoint(worldpos);
         horizontalSpeed = Random.Range(-2f,2f) * Screen.width/50;
         verticalSpeed = Random.Range(1f, 2.5f) * Screen.height/50;
         SetColor(type);
+        gameObject.SetActive(true);
+        gameObject.transform.SetAsLastSibling();
+        StartCoroutine("AnimationNoCrit");
+    }
+    public void SetAsStatus(Enums.StatusEffect status, Vector3 worldpos)
+    {
+        notificationText.text = "Frozen";
+        transform.position = Camera.main.WorldToScreenPoint(worldpos);
+        horizontalSpeed = Random.Range(-2f, 2f) * Screen.width / 50;
+        verticalSpeed = Random.Range(1f, 2.5f) * Screen.height / 50;
+        SetColor(Enums.DamageType.cryo);
         gameObject.SetActive(true);
         gameObject.transform.SetAsLastSibling();
         StartCoroutine("AnimationNoCrit");

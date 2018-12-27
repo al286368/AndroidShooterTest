@@ -11,7 +11,7 @@ public class BeamBehaviour : MonoBehaviour {
     public Transform endPoint;
     public Transform aimPoint;
 
-    private EntityBase entityUser;
+    private IEntity entityUser;
 
     private float damage_phys = 0;
     private float damage_photon = 0;
@@ -27,7 +27,7 @@ public class BeamBehaviour : MonoBehaviour {
     private string lastCollisionTag = "";
     private Collider2D lastHitCollider;
 
-    public void SetBeam(EntityBase e_user, Vector2 basePos, int inhBounces, float degree, Collider2D colliderToIgnore = null)
+    public void SetBeam(IEntity e_user, Vector2 basePos, int inhBounces, float degree, Collider2D colliderToIgnore = null)
     {
         gameObject.SetActive(true);
 
@@ -36,11 +36,11 @@ public class BeamBehaviour : MonoBehaviour {
 
         entityUser = e_user;
 
-        damage_phys = e_user.stat_damage_physical;
-        damage_photon = e_user.stat_damage_photon;
-        damage_cryo = e_user.stat_damage_cryo;
-        damage_electric = e_user.stat_damage_electric;
-        damage_nuclear = e_user.stat_damage_nuclear;
+        damage_phys = e_user.GetPhysicalDamage();
+        damage_photon = e_user.GetPhotonDamage();
+        damage_cryo = e_user.GetCryoDamage();
+        damage_electric = e_user.GetElectricDamage();
+        damage_nuclear = e_user.GetNuclearDamage();
 
         bounces = inhBounces;
         aimDegree = degree;
@@ -69,7 +69,7 @@ public class BeamBehaviour : MonoBehaviour {
 
         if (lastCollisionTag == "Entity")
         {
-            EntityBase lastDamagedEntity = RH2D.collider.gameObject.GetComponent<EntityBase>();
+            IEntity lastDamagedEntity = RH2D.collider.gameObject.GetComponent<IEntity>();
             if (lastDamagedEntity != null)
             {
                 HitEnemyEntity(lastDamagedEntity);
@@ -94,9 +94,9 @@ public class BeamBehaviour : MonoBehaviour {
         if (difX > 0) { return Mathf.Atan(difY / difX) * Mathf.Rad2Deg; }
         else { return (Mathf.Atan(difY / difX) * Mathf.Rad2Deg) + 180; }
     }
-    private void HitEnemyEntity(EntityBase e)
+    private void HitEnemyEntity(IEntity e)
     {
-        if (entityUser.isAlly == e.isAlly)
+        if (entityUser.IsAlly() == e.IsAlly())
             return;
 
         e.DealDamage(damage_phys, Enums.DamageType.normal);

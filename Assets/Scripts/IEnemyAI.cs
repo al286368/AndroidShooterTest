@@ -5,4 +5,5 @@ using UnityEngine;
 public interface IEnemyAI
 {
     void ResetAI();
+    void NotifyDamageTaken(float dmg);
 }

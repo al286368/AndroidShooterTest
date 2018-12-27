@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour {
     private float speed = 10f;
     private Touch t;
 
-    public EntityBase EB;
+    public PlayerEntity pe;
 
     private bool holdingFireButton = false;
 
@@ -46,12 +46,14 @@ public class PlayerController : MonoBehaviour {
     }
     private void ControlsComputer()
     {
+        if (holdingFireButton)
+            pe.Shoot(90);
         transform.Translate(new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0) * Time.fixedDeltaTime * speed);
     }
     private void ControlsPhone()
     {
         if (holdingFireButton)
-            EB.Shoot();
+            pe.Shoot(90);
         if (Input.touchCount == 0)
             return;
         for (int i = 0; i < Input.touchCount; i++)

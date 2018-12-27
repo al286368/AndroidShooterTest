@@ -7,7 +7,7 @@ public class BeamBehaviourAlternative : MonoBehaviour {
     public Transform targetPoint;
     public Transform trailTransform;
 
-    private EntityBase entityUser;
+    private IEntity entityUser;
 
 	// Use this for initialization
 	void Start () {
@@ -18,7 +18,7 @@ public class BeamBehaviourAlternative : MonoBehaviour {
 	void Update () {
 		
 	}
-    public void SetBeam(EntityBase e_user, Vector2 basePos, float degree, Collider2D colliderToIgnore = null)
+    public void SetBeam(IEntity e_user, Vector2 basePos, float degree, Collider2D colliderToIgnore = null)
     {
         entityUser = e_user;
         transform.position = basePos;

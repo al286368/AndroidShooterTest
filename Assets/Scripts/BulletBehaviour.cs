@@ -5,16 +5,17 @@ using UnityEngine;
 public class BulletBehaviour : MonoBehaviour {
 
     private const float BOUNDS_Y = 10;
+    private const float BASE_SPEED = 30;
 
     private float damage_phys = 0;
     private float damage_photon = 0;
     private float damage_cryo = 0;
     private float damage_electric = 0;
     private float damage_nuclear = 0;
-    private float property_speed = 30;
+    private float property_speedScale = 1;
     private float property_bounces = 10;
     private float trajectory_helix = 0;
-    private float trajectory_arc = 0;
+    private float trajectory_wave = 0;
     private float trajectory_track = 0;
 
     private const float BACK_TO_POOL_DELAY = 0.75f;
@@ -23,10 +24,11 @@ public class BulletBehaviour : MonoBehaviour {
     private float tmp_backToPoolDelay = 0;
     private bool waitingToRecycle = false;
 
-    private EntityBase entity_user;
+    private IEntity entity_user;
 
-    private EntityBase currentTarget;
+    private IEntity currentTarget;
 
+    private float lifetime = 0;
     public float currentDegree = 0;
     public int lr = 0;
 
@@ -37,22 +39,29 @@ public class BulletBehaviour : MonoBehaviour {
 
 
 
-    public void SetBullet(Vector3 pos, float degree, EntityBase e_user)
+    public void SetBullet(Vector3 pos, float degree, IEntity e_user, int _lr = 0)
     {
+        currentTarget = null;
+        lifetime = 0;
         entity_user = e_user;
+        lr = _lr;
         trail.TR.Clear();
         trail.SetTrail(0.2f, 0f, 0.25f, Color.blue, transform);
         transform.position = pos;
         currentDegree = degree;
         ResetBullet();
 
-        damage_phys = e_user.stat_damage_physical;
-        damage_photon = e_user.stat_damage_photon;
-        damage_cryo = e_user.stat_damage_cryo;
-        damage_electric = e_user.stat_damage_electric;
-        damage_nuclear = e_user.stat_damage_nuclear;
+        damage_phys = e_user.GetPhysicalDamage();
+        damage_photon = e_user.GetPhotonDamage();
+        damage_cryo = e_user.GetCryoDamage();
+        damage_electric = e_user.GetElectricDamage();
+        damage_nuclear = e_user.GetNuclearDamage();
+        property_speedScale = e_user.GetBulletSpeedScale();
+        trajectory_helix = e_user.GetTrajectoryHelix();
+        trajectory_track = e_user.GetTrajectoryTracking();
+        trajectory_wave = e_user.GetTrajectoryWave();
 
-        property_bounces = e_user.stat_bounces;
+        property_bounces = e_user.GetBulletBounces();
 
     }
 
@@ -69,8 +78,9 @@ public class BulletBehaviour : MonoBehaviour {
         {
             UpdateTrajectory();
             transform.rotation = Quaternion.Euler(0, 0, currentDegree);
-            transform.Translate(Vector3.right * Time.fixedDeltaTime * property_speed);
+            transform.Translate(Vector3.right * Time.fixedDeltaTime * property_speedScale * BASE_SPEED);
             tmp_bounceCooldown -= Time.fixedDeltaTime;
+            lifetime += Time.fixedDeltaTime * property_speedScale;
             CheckBounds();
         }
 
@@ -81,12 +91,21 @@ public class BulletBehaviour : MonoBehaviour {
                 currentTarget = StageManager.currentInstance.GetRandomEnemy();
             else
             {
-                currentDegree = Mathf.MoveTowardsAngle(currentDegree, TrackTo(currentTarget.transform), 600 * Time.fixedDeltaTime);
+                if (currentTarget.IsAlive())
+                {
+                    currentDegree = Mathf.MoveTowardsAngle(currentDegree, TrackTo(currentTarget.GetGameObject().transform), 600 * Time.fixedDeltaTime * trajectory_track * property_speedScale);
+                }
+                else
+                {
+                    currentTarget = null;
+                }
+
             }
         }
         if (trajectory_helix > 0) {
+            currentDegree += trajectory_helix * Time.fixedDeltaTime * property_speedScale * Mathf.Cos(lifetime * 20) * 500f * lr;
         }
-        if (trajectory_arc > 0) {
+        if (trajectory_wave > 0) {
         }
     }
     private void ResetBullet()
@@ -113,10 +132,10 @@ public class BulletBehaviour : MonoBehaviour {
         if (collision.gameObject.tag != "Entity")
             return;
 
-        EntityBase lastDamagedEntity = collision.gameObject.GetComponent<EntityBase>();
+        IEntity lastDamagedEntity = collision.gameObject.GetComponent<IEntity>();
         if (lastDamagedEntity == null)
             return;
-        if (entity_user.isAlly == lastDamagedEntity.isAlly)
+        if (entity_user.IsAlly() == lastDamagedEntity.IsAlly())
             return;
         HitEnemyEntity(lastDamagedEntity);
     }
@@ -126,6 +145,7 @@ public class BulletBehaviour : MonoBehaviour {
         {
             if (property_bounces > 0)
             {
+                trajectory_helix = 0;
                 property_bounces--;
                 tmp_bounceCooldown = BOUNCE_COOLDOWN;
                 currentDegree = 180 - currentDegree;
@@ -141,6 +161,7 @@ public class BulletBehaviour : MonoBehaviour {
 
         if (property_bounces > 0)
         {
+            trajectory_helix = 0;
             property_bounces--;
             currentDegree = Random.Range(0, 361);
         }
@@ -170,7 +191,7 @@ public class BulletBehaviour : MonoBehaviour {
         waitingToRecycle = true;
         hitboxParent.gameObject.SetActive(false);
     }
-    private void HitEnemyEntity(EntityBase e)
+    private void HitEnemyEntity(IEntity e)
     {
         EntityCollision();
         e.DealDamage(damage_phys, Enums.DamageType.normal);
