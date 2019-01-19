@@ -5,6 +5,7 @@ using UnityEngine;
 public class PrefabManager : MonoBehaviour {
 
     public GameObject enemy_drifter;
+    public GameObject enemy_bomber;
 
     public static PrefabManager currentInstance;
 

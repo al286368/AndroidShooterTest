@@ -42,7 +42,7 @@ public class NotificationBehaviour : MonoBehaviour {
                     notificationText.color = Color.white;
                     break;
                 }
-            case Enums.DamageType.electric:
+            case Enums.DamageType.electricDamage:
                 {
                     notificationText.color = Color.yellow;
                     break;
@@ -52,7 +52,7 @@ public class NotificationBehaviour : MonoBehaviour {
                     notificationText.color = Color.cyan;
                     break;
                 }
-            case Enums.DamageType.nuclear:
+            case Enums.DamageType.nuclearDamage:
                 {
                     notificationText.color = Color.blue;
                     break;

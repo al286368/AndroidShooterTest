@@ -15,6 +15,7 @@ public class ShipData {
     private float shieldRecoveryDelay;
     private float baseDefense;
     private float specialRechargeRate;
+    private float heatRecovery;
     private int upgradeSlots;
 
     private List<Upgrade> upgradesInstalled;
@@ -26,6 +27,7 @@ public class ShipData {
         specialRechargeRate = 1;
         shieldRecoveryRate = 20;
         shieldRecoveryDelay = 2;
+        heatRecovery = 10;
         upgradeSlots = 5;
     }
 
@@ -53,5 +55,8 @@ public class ShipData {
     }
     public float GetShieldRecoveryDelay() {
         return shieldRecoveryDelay;
+    }
+    public float GetHeatRecovery() {
+        return heatRecovery;
     }
 }

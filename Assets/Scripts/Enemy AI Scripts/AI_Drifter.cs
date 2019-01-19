@@ -8,7 +8,7 @@ public class AI_Drifter : MonoBehaviour, IEnemyAI
     private IEntity player;
     private Vector3 targetPos;
 
-    public EntityNPC entityNPC;
+    public EntityNPC EntityManaged;
 
     float shootready = 0;
     float movespeed = 20;
@@ -25,7 +25,7 @@ public class AI_Drifter : MonoBehaviour, IEnemyAI
     private const float EVADE_SPEED = 30;
     private const float ESCAPE_SPEED = 15;
 
-    private const float RETREAT_TIME = 10f;
+    private const float RETREAT_TIME = 12f;
 
     private float findNextPositionTimer = 0;
     private float lifetime = 0;
@@ -42,15 +42,15 @@ public class AI_Drifter : MonoBehaviour, IEnemyAI
         else
         {
             angleToTarget = TrackTo(player.GetGameObject().transform);
-            if (entityNPC.GetEntityTimescale() > 0)
+            if (EntityManaged.GetEntityTimescale() > 0)
                 transform.rotation = Quaternion.Euler(0,0, angleToTarget+90);
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * movespeed * entityNPC.GetEntityTimescale());
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, Time.deltaTime * movespeed * EntityManaged.GetEntityTimescale());
 
         if (lifetime < RETREAT_TIME)
         {
-            lifetime += Time.deltaTime * entityNPC.GetEntityTimescale();
+            lifetime += Time.deltaTime * EntityManaged.GetEntityTimescale();
             if (lifetime >= RETREAT_TIME)
             {
                 movespeed = ESCAPE_SPEED;
@@ -59,14 +59,14 @@ public class AI_Drifter : MonoBehaviour, IEnemyAI
         }
         else if (transform.position == targetPos)
         {
-            entityNPC.RetreatFromStage();
+            EntityManaged.RetreatFromStage();
         }
 
-        shootready += Time.deltaTime * entityNPC.GetEntityTimescale();
+        shootready += Time.deltaTime * EntityManaged.GetEntityTimescale();
         if (shootready > 1 && player != null)
         {
             shootready = 0;
-            entityNPC.Shoot(angleToTarget);
+            EntityManaged.Shoot(angleToTarget);
         }
     }
     public void ResetAI()

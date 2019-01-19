@@ -6,70 +6,132 @@ public class PlayerEntity : MonoBehaviour, IEntity {
 
     private ShipData playerShipData;
     private WeaponData playerWeaponData;
+    public Collider2D entityHitbox;
+
     public float currentHealth;
     public float currentShield;
     public float status_frozen;
     public float status_burning;
-    public Collider2D entityHitbox;
-    private bool coRoutine_burning = false;
 
-    private const float SHOOT_SECUENCE_DELAY = 0.05f;
-    private float shootReady = 0;
+    private bool coRoutine_burning = false;
+    private bool overheat = false;
+
+    private float tmpShootReady = 0;
+    private float tmpWeaponHeat = 0;
+    private float tmpHeatRecoveryReady = 0;
+    private float tmpSpecialReady = 0;
+
     private float lastShootAngle = 0;
     private float shieldRecoverReady = 0;
+
+    private const float SHOOT_SECUENCE_DELAY = 0.05f;
+    private const float OVERHEAT_RECOVERY_DELAY = 1;
 
     void Start() {
         ResetEntity();
     }
     void Update()
     {
-        shootReady += Time.deltaTime * GetWeaponFirerate();
+        UpdatePlayerParamsAndStatus();
+    }
+    void UpdatePlayerParamsAndStatus() {
+        tmpShootReady += Time.deltaTime * GetWeaponFirerate();
+        tmpSpecialReady = Mathf.MoveTowards(tmpSpecialReady, 100, Time.deltaTime * playerShipData.GetSpecialRechargeRate());
+
+        if (tmpHeatRecoveryReady >= OVERHEAT_RECOVERY_DELAY)
+        {
+            tmpWeaponHeat = Mathf.MoveTowards(tmpWeaponHeat, 0, Time.deltaTime * playerShipData.GetHeatRecovery());
+            if (overheat && tmpWeaponHeat == 0)
+                overheat = false;
+        }
+        else
+            tmpHeatRecoveryReady += Time.deltaTime;
+
         if (shieldRecoverReady > 0)
             shieldRecoverReady -= Time.deltaTime;
-        else {
+        else
             currentShield = Mathf.MoveTowards(currentShield, playerShipData.GetShipShield(), Time.deltaTime * playerShipData.GetShieldRecoveryRate());
+    }
+    public void IncreaseWeaponHeat(float amount) {
+        tmpWeaponHeat += amount;
+        if (tmpWeaponHeat > 100) {
+            tmpWeaponHeat = 100;
+            overheat = true;
+            tmpHeatRecoveryReady = 0;
         }
     }
     #region Shooting Methods
-    private int GetLrForIndex(int index) {
-        if (GetMultishoot() == 1)
-            return 0;
-        if (GetMultishoot() % 2 != 0 && index + 1 == (GetMultishoot() / 2)+1)
-            return 0;
-        else if (index < GetMultishoot() / 2f)
-            return -1;
-        else
-            return 1;
+    public void Shoot(float angle)
+    {
+        if (tmpShootReady < 1 || overheat)
+            return;
+        tmpShootReady = 0;
+
+        lastShootAngle = angle;
+
+        switch (GetWeaponShootSecuence())
+        {
+            case WeaponData.ShootSecuence.normal:
+                {
+                    ShootNormal(angle);
+                    break;
+                }
+            case WeaponData.ShootSecuence.barrage_standard:
+                {
+                    StartCoroutine("ShootBarrageStandard");
+                    break;
+                }
+            case WeaponData.ShootSecuence.barrage_1way:
+                {
+                    StartCoroutine("ShootBarrage1Way");
+                    break;
+                }
+            case WeaponData.ShootSecuence.barrage_2way:
+                {
+                    StartCoroutine("ShootBarrage2Way");
+                    break;
+                }
+            case WeaponData.ShootSecuence.barrage_crossful:
+                {
+                    StartCoroutine("ShootBarrageCrossfull");
+                    break;
+                }
+            case WeaponData.ShootSecuence.barrage_crosshalf:
+                {
+                    StartCoroutine("ShootBarrageCrosshalf");
+                    break;
+                }
+        }
     }
     private void ShootNormal(float angle)
     {
-        float baseShootAngle = angle;
         if (GetMultishoot() > 1)
         {
-            float tmpAngle = baseShootAngle + (GetMultishootArc() / 2f);
+            float tmpAngle = GetMultishootArc() / 2f;
             int t = 0;
             while (t < GetMultishoot())
             {
-                CreateAttackBasedOnWeaponType(tmpAngle, GetLrForIndex(t));
+
+                CreateAttackBasedOnWeaponType(angle, tmpAngle);
                 tmpAngle -= GetMultishootArc() / (GetMultishoot() - 1);
                 t++;
             }
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
+            CreateAttackBasedOnWeaponType(angle, 0);
 
         }
-
-
+        IncreaseWeaponHeat(GetHeatPerProjectile() * GetMultishoot());
     }
     IEnumerator ShootBarrageStandard()
     {
-        float baseShootAngle = lastShootAngle;
         int count = 0;
+        float baseShootAngle = lastShootAngle;
         while (count < 5)
         {
             ShootNormal(baseShootAngle);
+            IncreaseWeaponHeat(GetHeatPerProjectile());
             count++;
             yield return new WaitForSeconds(SHOOT_SECUENCE_DELAY);
         }
@@ -77,7 +139,7 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     IEnumerator ShootBarrage1Way()
     {
         float baseShootAngle = lastShootAngle;
-        float tmpAngle = baseShootAngle + (GetMultishootArc() / 2f);
+        float tmpAngle = GetMultishootArc() / 2f;
         int t = 0;
 
         if (GetMultishoot() > 1)
@@ -85,7 +147,8 @@ public class PlayerEntity : MonoBehaviour, IEntity {
 
             while (t < GetMultishoot())
             {
-                CreateAttackBasedOnWeaponType(tmpAngle, GetLrForIndex(t));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle);
+                IncreaseWeaponHeat(GetHeatPerProjectile());
                 tmpAngle -= GetMultishootArc() / (GetMultishoot() - 1);
                 t++;
                 yield return new WaitForSeconds(SHOOT_SECUENCE_DELAY);
@@ -93,14 +156,14 @@ public class PlayerEntity : MonoBehaviour, IEntity {
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
-
+            CreateAttackBasedOnWeaponType(baseShootAngle, 0);
+            IncreaseWeaponHeat(GetHeatPerProjectile());
         }
     }
     IEnumerator ShootBarrage2Way()
     {
         float baseShootAngle = lastShootAngle;
-        float tmpAngle = baseShootAngle + (GetMultishootArc() / 2f);
+        float tmpAngle = GetMultishootArc() / 2f;
         int t = 0;
 
         if (GetMultishoot() > 1)
@@ -108,7 +171,8 @@ public class PlayerEntity : MonoBehaviour, IEntity {
 
             while (t < GetMultishoot())
             {
-                CreateAttackBasedOnWeaponType(tmpAngle, GetLrForIndex(t));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle);
+                IncreaseWeaponHeat(GetHeatPerProjectile());
                 tmpAngle -= GetMultishootArc() / (GetMultishoot() - 1);
                 t++;
                 yield return new WaitForSeconds(SHOOT_SECUENCE_DELAY);
@@ -119,7 +183,8 @@ public class PlayerEntity : MonoBehaviour, IEntity {
 
             while (t >= 0)
             {
-                CreateAttackBasedOnWeaponType(tmpAngle, GetLrForIndex(t));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle);
+                IncreaseWeaponHeat(GetHeatPerProjectile());
                 tmpAngle += GetMultishootArc() / (GetMultishoot() - 1);
                 t--;
                 yield return new WaitForSeconds(SHOOT_SECUENCE_DELAY);
@@ -127,15 +192,16 @@ public class PlayerEntity : MonoBehaviour, IEntity {
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
+            CreateAttackBasedOnWeaponType(baseShootAngle, 0);
+            IncreaseWeaponHeat(GetHeatPerProjectile());
 
         }
     }
     IEnumerator ShootBarrageCrossfull()
     {
         float baseShootAngle = lastShootAngle;
-        float tmpAngle1 = baseShootAngle + (GetMultishootArc() / 2f);
-        float tmpAngle2 = baseShootAngle - (GetMultishootArc() / 2f);
+        float tmpAngle1 = GetMultishootArc() / 2f;
+        float tmpAngle2 = -GetMultishootArc() / 2f;
         int i = 0;
 
         if (GetMultishoot() > 1)
@@ -143,8 +209,9 @@ public class PlayerEntity : MonoBehaviour, IEntity {
 
             while (i < GetMultishoot())
             {
-                CreateAttackBasedOnWeaponType(tmpAngle1, GetLrForIndex(i));
-                CreateAttackBasedOnWeaponType(tmpAngle2, -GetLrForIndex(i));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle1);
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle2);
+                IncreaseWeaponHeat(GetHeatPerProjectile() * 2);
 
                 tmpAngle1 -= GetMultishootArc() / (GetMultishoot() - 1);
                 tmpAngle2 += GetMultishootArc() / (GetMultishoot() - 1);
@@ -154,14 +221,15 @@ public class PlayerEntity : MonoBehaviour, IEntity {
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
+            CreateAttackBasedOnWeaponType(baseShootAngle, 0);
+            IncreaseWeaponHeat(GetHeatPerProjectile());
         }
     }
     IEnumerator ShootBarrageCrosshalf()
     {
         float baseShootAngle = lastShootAngle;
-        float tmpAngle1 = baseShootAngle + (GetMultishootArc() / 2f);
-        float tmpAngle2 = baseShootAngle - (GetMultishootArc() / 2f);
+        float tmpAngle1 = GetMultishootArc() / 2f;
+        float tmpAngle2 = -GetMultishootArc() / 2f;
         int i = 0;
 
         if (GetMultishoot() > 1)
@@ -169,8 +237,9 @@ public class PlayerEntity : MonoBehaviour, IEntity {
 
             while (i < (GetMultishoot() / 2))
             {
-                CreateAttackBasedOnWeaponType(tmpAngle1, GetLrForIndex(i));
-                CreateAttackBasedOnWeaponType(tmpAngle2, -GetLrForIndex(i));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle1);
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle2);
+                IncreaseWeaponHeat(GetHeatPerProjectile() * 2);
 
                 tmpAngle1 -= GetMultishootArc() / (GetMultishoot() - 1);
                 tmpAngle2 += GetMultishootArc() / (GetMultishoot() - 1);
@@ -179,47 +248,49 @@ public class PlayerEntity : MonoBehaviour, IEntity {
             }
             if (GetMultishoot() % 2 != 0)
             {
-                CreateAttackBasedOnWeaponType(baseShootAngle);
+                CreateAttackBasedOnWeaponType(baseShootAngle, 0);
+                IncreaseWeaponHeat(GetHeatPerProjectile());
             }
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
+            CreateAttackBasedOnWeaponType(baseShootAngle, 0);
+            IncreaseWeaponHeat(GetHeatPerProjectile());
         }
     }
-    private void CreateAttackBasedOnWeaponType(float degree, int lr = 0)
+    private void CreateAttackBasedOnWeaponType(float degree, float local)
     {
         switch (GetWeaponAttackType())
         {
             case WeaponData.AttackType.beam:
                 {
-                    CreateBeam(degree);
+                    CreateBeam(degree, local);
                     break;
                 }
             case WeaponData.AttackType.projectile:
                 {
-                    CreateBullet(degree, lr);
+                    CreateBullet(degree, local);
                     break;
                 }
         }
     }
-    private void CreateBullet(float degree, int lr = 0)
+    private void CreateBullet(float degree, float local)
     {
         BulletBehaviour bullet;
         bullet = ObjectPool.currentInstance.GetBulletFromPool();
-        if (GetWeaponRandomSpread() > 0) bullet.SetBullet(transform.position, degree + Random.Range(-GetWeaponRandomSpread(), GetWeaponRandomSpread()), this, lr);
-        else bullet.SetBullet(transform.position, degree, this, lr);
+        if (GetWeaponRandomSpread() > 0) bullet.SetBullet(transform.position, degree + Random.Range(-GetWeaponRandomSpread(), GetWeaponRandomSpread()), local, this);
+        else bullet.SetBullet(transform.position, degree, local, this);
     }
-    private void CreateBeam(float degree)
+    private void CreateBeam(float degree, float local)
     {
         BeamBehaviour beam;
         beam = ObjectPool.currentInstance.GetBeamFromPool();
-        if (GetWeaponRandomSpread() > 0) beam.SetBeam(this, transform.position, GetWeaponBounces(), degree + Random.Range(-GetWeaponRandomSpread(), GetWeaponRandomSpread()), entityHitbox);
+        if (GetWeaponRandomSpread() > 0) beam.SetBeam(this, transform.position, GetBulletBounces(), degree + Random.Range(-GetWeaponRandomSpread(), GetWeaponRandomSpread()), entityHitbox);
         else beam.SetBeam(this, transform.position, GetWeaponBounces(), degree, entityHitbox);
     }
     #endregion
     #region Interface implementation and Getters
-    public void DealDamage(float amount, Enums.DamageType dmgType)
+    public void DealDamage(float amount, Enums.DamageType dmgType, IEntity damageDealer)
     {
         if (amount <= 0)
             return;
@@ -245,12 +316,12 @@ public class PlayerEntity : MonoBehaviour, IEntity {
                     status_frozen += amount;
                     break;
                 }
-            case Enums.DamageType.nuclear:
+            case Enums.DamageType.nuclearDamage:
                 {
                     SubstractHealthAndShield(amount, true);
                     break;
                 }
-            case Enums.DamageType.electric:
+            case Enums.DamageType.electricDamage:
                 {
                     SubstractHealthAndShield(amount, false);
                     break;
@@ -322,14 +393,8 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     {
         return playerWeaponData.GetMultishootArc();
     }
-    public float GetTrajectoryHelix() {
-        return playerWeaponData.GetTrajectoryHelix();
-    }
-    public float GetTrajectoryWave() {
-        return playerWeaponData.GetTrajectoryWave();
-    }
-    public float GetTrajectoryTracking() {
-        return playerWeaponData.GetTrajectoryTracking();
+    public WeaponData.ProjectileTrajectory GetWeaponProjectileTrajectory() {
+        return playerWeaponData.GetWeaponProjectileTrajectory();
     }
     public float GetWeaponRandomSpread()
     {
@@ -363,48 +428,6 @@ public class PlayerEntity : MonoBehaviour, IEntity {
         gameObject.SetActive(false);
     }
 
-    public void Shoot(float angle)
-    {
-        if (shootReady < 1)
-            return;
-        lastShootAngle = angle;
-        shootReady = 0;
-
-        switch (GetWeaponShootSecuence())
-        {
-            case WeaponData.ShootSecuence.normal:
-                {
-                    ShootNormal(angle);
-                    break;
-                }
-            case WeaponData.ShootSecuence.barrage_standard:
-                {
-                    StartCoroutine("ShootBarrageStandard");
-                    break;
-                }
-            case WeaponData.ShootSecuence.barrage_1way:
-                {
-                    StartCoroutine("ShootBarrage1Way");
-                    break;
-                }
-            case WeaponData.ShootSecuence.barrage_2way:
-                {
-                    StartCoroutine("ShootBarrage2Way");
-                    break;
-                }
-            case WeaponData.ShootSecuence.barrage_crossful:
-                {
-                    StartCoroutine("ShootBarrageCrossfull");
-                    break;
-                }
-            case WeaponData.ShootSecuence.barrage_crosshalf:
-                {
-                    StartCoroutine("ShootBarrageCrosshalf");
-                    break;
-                }
-        }
-    }
-
     public float GetEntityTimescale()
     {
         return 1;
@@ -434,14 +457,38 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     public float GetShieldPercent() {
         return currentShield / playerShipData.GetShipShield();
     }
-    public float GetShieldRecoveryPercent() {
-        return (playerShipData.GetShieldRecoveryDelay()-shieldRecoverReady) / playerShipData.GetShieldRecoveryDelay();
-    }
     public int GetCurrentHealth() {
         return (int)currentHealth;
     }
     public int GetCurrentShield() {
         return (int)currentShield;
+    }
+    public WeaponData.DamageElement GetDamageElement() {
+        return playerWeaponData.GetWeaponElement();
+    }
+    #endregion
+    #region Player Entity Getters
+    public float GetWeaponHeat() {
+        return tmpWeaponHeat;
+    }
+    public float GetSpecialCharge() {
+        return tmpSpecialReady;
+    }
+    public float GetShieldRecoveryPercent()
+    {
+        return (playerShipData.GetShieldRecoveryDelay() - shieldRecoverReady) / playerShipData.GetShieldRecoveryDelay();
+    }
+    public float GetHeatPerProjectile() {
+        return playerWeaponData.GetHeatPerProjectile();
+    }
+    public bool CanShoot() {
+        return !overheat;
+    }
+    public bool IsOverheated() {
+        return overheat;
+    }
+    public bool SpecialReady() {
+        return tmpSpecialReady >= 100;
     }
     #endregion
 }

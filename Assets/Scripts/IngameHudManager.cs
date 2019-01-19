@@ -18,10 +18,13 @@ public class IngameHudManager : MonoBehaviour {
     public Image slider_special;
     public Image slider_heat;
     public Image slider_heatRecovery;
+    public Image heatBlinkImage;
     public Text text_health;
     public Text text_shield;
     public Text text_special;
     public Text text_heat;
+    public Text text_overheat;
+    public Text text_specialready;
     [Header("Entity References")]
     public PlayerEntity player;
 
@@ -40,6 +43,10 @@ public class IngameHudManager : MonoBehaviour {
         currentInstance = this;
         InitializePool();
     }
+    private void Start()
+    {
+        StartCoroutine("HeatBlink");
+    }
     private void Update()
     {
         UpdateEnergyBar();
@@ -48,22 +55,25 @@ public class IngameHudManager : MonoBehaviour {
         UpdateHeatBar();
     }
     void UpdateEnergyBar() {
-        animation_EnergyPercent = Mathf.MoveTowards(animation_EnergyPercent, player.GetHealthPercent(), Time.deltaTime * ANIMATION_BAR_SPEED);
+        animation_EnergyPercent = Mathf.MoveTowards(animation_EnergyPercent, player.GetHealthPercent() * 0.75f, Time.deltaTime * ANIMATION_BAR_SPEED);
         slider_energy.fillAmount = animation_EnergyPercent;
         animation_EnergyAmount = Mathf.MoveTowards(animation_EnergyAmount, player.GetCurrentHealth(), Time.deltaTime * ANIMATION_NUMBER_SPEED);
         text_health.text = ((int)animation_EnergyAmount).ToString();
     }
     void UpdateShieldBar() {
-        animation_ShieldPercent = Mathf.MoveTowards(animation_ShieldPercent, player.GetShieldPercent(), Time.deltaTime * ANIMATION_BAR_SPEED);
+        animation_ShieldPercent = Mathf.MoveTowards(animation_ShieldPercent, player.GetShieldPercent() * 0.75f, Time.deltaTime * ANIMATION_BAR_SPEED);
         slider_shield.fillAmount = animation_ShieldPercent;
         animation_ShieldAmount = Mathf.MoveTowards(animation_ShieldAmount, player.GetCurrentShield(), Time.deltaTime * ANIMATION_NUMBER_SPEED);
         text_shield.text = ((int)animation_ShieldAmount).ToString();
-        slider_shieldRecovery.fillAmount = player.GetShieldRecoveryPercent();
+        slider_shieldRecovery.fillAmount = player.GetShieldRecoveryPercent() * 0.75f;
     }
     void UpdateHeatBar() {
+        slider_heat.fillAmount = player.GetWeaponHeat()/100;
+        text_overheat.enabled = player.IsOverheated();
     }
     void UpdateSpecialBar() {
-        
+        slider_special.fillAmount = player.GetSpecialCharge() / 100;
+        text_specialready.enabled = player.SpecialReady();
     }
     private void InitializePool()
     {
@@ -99,4 +109,27 @@ public class IngameHudManager : MonoBehaviour {
     {
         GetNotificationFromPool().SetAsDamage(dmg, type, worldpos);
     }
+    #region Animation Co-Routines
+    IEnumerator HeatBlink() {
+        float animspeed = 2;
+        float t = 0;
+        while (true) {
+            while (player.GetWeaponHeat() < 60)
+            {
+                yield return null;
+            }
+            t = 0;
+            while (t < 1)
+            {
+                t += Time.deltaTime * animspeed;
+                heatBlinkImage.color = new Color(1, 1, 0, (1 - t) * 0.5f);
+                heatBlinkImage.transform.localScale = new Vector3(1+ t*0.1f, (t+1)*2, 1);
+                yield return null;
+            }
+            yield return (100-player.GetWeaponHeat())/100;
+
+        }
+
+    }
+    #endregion
 }

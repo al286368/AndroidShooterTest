@@ -8,13 +8,15 @@ public class ObjectPool : MonoBehaviour {
     public GameObject prefab_bullets;
     public GameObject prefab_beams;
     public GameObject prefab_explosions;
+    public GameObject prefab_sparks;
     [Header("Object Group Parent")]
-    public Transform parent_bullets;
+    public Transform parent_attacks;
     public Transform parent_beams;
-    public Transform parent_explosions;
 
     private List<BulletBehaviour> pool_bullets;
+    private List<ElectricSparkBehaviour> pool_sparks;
     private List<BeamBehaviour> pool_beams;
+    private List<ExplosionBehaviour> pool_explosions;
 
     private const int BASE_POOL_SIZE = 10;
 
@@ -33,7 +35,7 @@ public class ObjectPool : MonoBehaviour {
         pool_bullets = new List<BulletBehaviour>();
         for (int i = 0; i < BASE_POOL_SIZE; i++)
         {
-            lastInstantiatedObject = Instantiate(prefab_bullets, parent_bullets) as GameObject;
+            lastInstantiatedObject = Instantiate(prefab_bullets, parent_attacks) as GameObject;
             lastInstantiatedObject.gameObject.SetActive(false);
             pool_bullets.Add(lastInstantiatedObject.GetComponent<BulletBehaviour>());
         }
@@ -44,6 +46,20 @@ public class ObjectPool : MonoBehaviour {
             lastInstantiatedObject = Instantiate(prefab_beams, parent_beams) as GameObject;
             lastInstantiatedObject.gameObject.SetActive(false);
             pool_beams.Add(lastInstantiatedObject.GetComponent<BeamBehaviour>());
+        }
+        pool_sparks = new List<ElectricSparkBehaviour>();
+        for (int i = 0; i < BASE_POOL_SIZE; i++)
+        {
+            lastInstantiatedObject = Instantiate(prefab_sparks, parent_attacks) as GameObject;
+            lastInstantiatedObject.gameObject.SetActive(false);
+            pool_sparks.Add(lastInstantiatedObject.GetComponent<ElectricSparkBehaviour>());
+        }
+        pool_explosions = new List<ExplosionBehaviour>();
+        for (int i = 0; i < BASE_POOL_SIZE; i++)
+        {
+            lastInstantiatedObject = Instantiate(prefab_explosions, parent_attacks) as GameObject;
+            lastInstantiatedObject.gameObject.SetActive(false);
+            pool_explosions.Add(lastInstantiatedObject.GetComponent<ExplosionBehaviour>());
         }
     }
     #endregion
@@ -58,7 +74,7 @@ public class ObjectPool : MonoBehaviour {
                 return pool_bullets[i];
             }
         }
-        GameObject lastInstantiatedObject = Instantiate(prefab_bullets, parent_bullets) as GameObject;
+        GameObject lastInstantiatedObject = Instantiate(prefab_bullets, parent_attacks) as GameObject;
         lastInstantiatedObject.gameObject.SetActive(false);
         pool_bullets.Add(lastInstantiatedObject.GetComponent<BulletBehaviour>());
         return lastInstantiatedObject.GetComponent<BulletBehaviour>();
@@ -76,6 +92,34 @@ public class ObjectPool : MonoBehaviour {
         lastInstantiatedObject.gameObject.SetActive(false);
         pool_beams.Add(lastInstantiatedObject.GetComponent<BeamBehaviour>());
         return lastInstantiatedObject.GetComponent<BeamBehaviour>();
+    }
+    public ElectricSparkBehaviour GetSparkFromPool()
+    {
+        for (int i = 0; i < pool_sparks.Count; i++)
+        {
+            if (!pool_sparks[i].gameObject.activeInHierarchy)
+            {
+                return pool_sparks[i];
+            }
+        }
+        GameObject lastInstantiatedObject = Instantiate(prefab_sparks, parent_attacks) as GameObject;
+        lastInstantiatedObject.gameObject.SetActive(false);
+        pool_sparks.Add(lastInstantiatedObject.GetComponent<ElectricSparkBehaviour>());
+        return lastInstantiatedObject.GetComponent<ElectricSparkBehaviour>();
+    }
+    public ExplosionBehaviour GetExplosionFromPool()
+    {
+        for (int i = 0; i < pool_explosions.Count; i++)
+        {
+            if (!pool_explosions[i].gameObject.activeInHierarchy)
+            {
+                return pool_explosions[i];
+            }
+        }
+        GameObject lastInstantiatedObject = Instantiate(prefab_explosions, parent_attacks) as GameObject;
+        lastInstantiatedObject.gameObject.SetActive(false);
+        pool_explosions.Add(lastInstantiatedObject.GetComponent<ExplosionBehaviour>());
+        return lastInstantiatedObject.GetComponent<ExplosionBehaviour>();
     }
     #endregion
 }

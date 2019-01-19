@@ -99,11 +99,11 @@ public class BeamBehaviour : MonoBehaviour {
         if (entityUser.IsAlly() == e.IsAlly())
             return;
 
-        e.DealDamage(damage_phys, Enums.DamageType.normal);
-        e.DealDamage(damage_photon, Enums.DamageType.photon);
-        e.DealDamage(damage_electric, Enums.DamageType.electric);
-        e.DealDamage(damage_cryo, Enums.DamageType.cryo);
-        e.DealDamage(damage_nuclear, Enums.DamageType.cryo);
+        e.DealDamage(damage_phys, Enums.DamageType.normal, entityUser);
+        e.DealDamage(damage_photon, Enums.DamageType.photon, entityUser);
+        e.DealDamage(damage_electric, Enums.DamageType.electricEffect, entityUser);
+        e.DealDamage(damage_cryo, Enums.DamageType.cryo, entityUser);
+        e.DealDamage(damage_nuclear, Enums.DamageType.nuclearEffect, entityUser);
     }
     private void CreateNextBounceBeam()
     {

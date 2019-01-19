@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour {
 
-    public GameObject EnemyToSpawn;
-
 	// Use this for initialization
 	void Start () {
         StartCoroutine("testSecuence");
@@ -17,13 +15,15 @@ public class EnemySpawner : MonoBehaviour {
 		
 	}
     IEnumerator testSecuence() {
-        int waves = 10;
+        int waves = 30;
+        yield return new WaitForSeconds(1);
         while (waves > 0)
         {
             waves--;
+            StageManager.currentInstance.SpawnBomber(new Vector3(0, 18, 0));
             StageManager.currentInstance.SpawnDrifter(new Vector3(-4, 18, 0));
             StageManager.currentInstance.SpawnDrifter(new Vector3(4, 18, 0));
-            yield return new WaitForSeconds(4);
+            yield return new WaitForSeconds(3);
         }
 
     }

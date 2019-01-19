@@ -13,13 +13,11 @@ public class PlayerController : MonoBehaviour {
     private bool holdingFireButton = false;
 
     private const float BOUNDS_MAX_Y = 0;
-    private const float BOUNDS_MIN_Y = -6.5f;
+    private const float BOUNDS_MIN_Y = -8.5f;
+    private const float BOUNDS_X = 5;
     private const float OUT_OF_BOUNDS_THS = 0.25f;
 
     private Vector3 targetPosition;
-
-    private float tmp_dist_to_bounds_x_min;
-    private float tmp_dist_to_bounds_x_max;
 
     public Transform debug_target_pos_indicator;
 
@@ -77,20 +75,6 @@ public class PlayerController : MonoBehaviour {
     }
     private void CheckBounds()
     {
-        tmp_dist_to_bounds_x_max = transform.position.x - StageManager.currentInstance.BOUNDS_MAX_X;
-        tmp_dist_to_bounds_x_min = transform.position.x - StageManager.currentInstance.BOUNDS_MIN_X;
-        if (tmp_dist_to_bounds_x_max > OUT_OF_BOUNDS_THS)
-        {
-            PlayerOutOfBounds();
-        }
-        if (tmp_dist_to_bounds_x_min < OUT_OF_BOUNDS_THS)
-        {
-            PlayerOutOfBounds();
-        }
-        transform.position = new Vector3(Mathf.Clamp(transform.position.x, StageManager.currentInstance.BOUNDS_MIN_X, StageManager.currentInstance.BOUNDS_MAX_X), Mathf.Clamp(transform.position.y, BOUNDS_MIN_Y, BOUNDS_MAX_Y), 0);
-    }
-    private void PlayerOutOfBounds()
-    {
-        
+        transform.position = new Vector3(Mathf.Clamp(transform.position.x, -BOUNDS_X, BOUNDS_X), Mathf.Clamp(transform.position.y, BOUNDS_MIN_Y, BOUNDS_MAX_Y), 0);
     }
 }

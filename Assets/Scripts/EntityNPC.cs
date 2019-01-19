@@ -5,7 +5,6 @@ using UnityEngine;
 public class EntityNPC : MonoBehaviour, IEntity {
 
     public enum WeaponAttackType { projectile, beam, missile }
-    public enum WeaponElement { physical, photon, nuclear, cryo, electro }
     public enum WeaponShotSecuenceType { normal, barrage_standard, barrage_1way, barrage_2way, barrage_crosshalf, barrage_crossfull }
     public enum RecycleTag { drifter, bomber, sniper }
 
@@ -36,17 +35,15 @@ public class EntityNPC : MonoBehaviour, IEntity {
     public float stat_effectiveness;
     public float stat_critChance;
     public float stat_critMultiplier;
-    public float stat_trajectoryTrack;
-    public float stat_trajectoryHelix;
-    public float stat_trajectoryWave;
     public float stat_bulletSpeed;
     public int stat_bounces;
     public int weapon_multishoot;
     public float weapon_multishootArc;
     public float weapon_randomSpread;
     public WeaponAttackType weapon_attackType;
-    public WeaponElement weapon_element;
+    public WeaponData.DamageElement weapon_element;
     public WeaponShotSecuenceType weapon_shootSecuenceType;
+    public WeaponData.ProjectileTrajectory weapon_trajectory;
     [Header("Other")]
     public Collider2D entity_hitbox;
     public IEnemyAI entityAI;
@@ -62,12 +59,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
     void Start()
     {
         ResetEntity();
-
-    }
-
-
-    void Update()
-    {
+ 
     }
     public void ResetEntity() {
         entityAI = GetComponent<IEnemyAI>();
@@ -82,7 +74,55 @@ public class EntityNPC : MonoBehaviour, IEntity {
         status_burning = 0;
         status_frozenRecoveryRate = 0;
     }
+    #region Status Coroutines
+    IEnumerator FireDamageOverTime()
+    {
+        coRoutine_burning = true;
+        float burnAmount;
 
+        while (status_burning > 0)
+        {
+            burnAmount = (int)(status_burning / 10);
+            if (burnAmount < 1)
+                burnAmount = 1;
+            status_burning -= burnAmount;
+            IngameHudManager.currentInstance.DisplayDamageNotification(burnAmount, Enums.DamageType.photon, transform.position);
+            SubstractHealthAndShield(burnAmount, false);
+            yield return new WaitForSeconds(0.5f);
+        }
+        coRoutine_burning = false;
+    }
+    IEnumerator FrozenStatus()
+    {
+        coRoutine_frozen = true;
+        float breakTimer = 0;
+        while (status_frozen > 0)
+        {
+            if (status_frozen >= 100)
+            {
+                breakTimer = 5;
+                stat_defense -= 1;
+                while (breakTimer > 0)
+                {
+                    breakTimer -= Time.deltaTime;
+                    yield return null;
+                }
+                stat_defense += 1;
+                status_frozen = 0;
+            }
+            else
+            {
+                status_frozenRecoveryRate += Time.deltaTime * 2;
+                status_frozen -= Time.deltaTime * status_frozenRecoveryRate;
+                if (status_frozen < 0)
+                    status_frozen = 0;
+            }
+            yield return null;
+        }
+        coRoutine_frozen = false;
+    }
+    #endregion
+    #region Shooting Functions
     public void Shoot(float angle)
     {
         lastShootAngle = angle;
@@ -121,34 +161,23 @@ public class EntityNPC : MonoBehaviour, IEntity {
                 }
         }
     }
-    private int GetLrForIndex(int index)
-    {
-        if (weapon_multishoot == 1)
-            return 0;
-        if (weapon_multishoot % 2 != 0 && index + 1 == (weapon_multishoot / 2) + 1)
-            return 0;
-        else if (index <weapon_multishoot / 2f)
-            return -1;
-        else
-            return 1;
-    }
     private void ShootNormal(float angle)
     {
         if (weapon_multishoot > 1)
         {
-            float tmpAngle = angle + (weapon_multishootArc / 2f);
+            float tmpAngle = weapon_multishootArc / 2f;
             int t = 0;
             while (t < weapon_multishoot)
             {
 
-                CreateAttackBasedOnWeaponType(tmpAngle, GetLrForIndex(t));
+                CreateAttackBasedOnWeaponType(angle, tmpAngle);
                 tmpAngle -= weapon_multishootArc / (weapon_multishoot - 1);
                 t++;
             }
         }
         else
         {
-            CreateAttackBasedOnWeaponType(angle);
+            CreateAttackBasedOnWeaponType(angle, 0);
 
         }
 
@@ -168,7 +197,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
     IEnumerator ShootBarrage1Way()
     {
         float baseShootAngle = lastShootAngle;
-        float tmpAngle = baseShootAngle + (weapon_multishootArc / 2f);
+        float tmpAngle = weapon_multishootArc / 2f;
         int t = 0;
 
         if (weapon_multishoot > 1)
@@ -176,7 +205,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
 
             while (t < weapon_multishoot)
             {
-                CreateAttackBasedOnWeaponType(tmpAngle, GetLrForIndex(t));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle);
                 tmpAngle -= weapon_multishootArc / (weapon_multishoot - 1);
                 t++;
                 yield return new WaitForSeconds(SHOOT_SECUENCE_DELAY);
@@ -184,14 +213,14 @@ public class EntityNPC : MonoBehaviour, IEntity {
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
+            CreateAttackBasedOnWeaponType(baseShootAngle, 0);
 
         }
     }
     IEnumerator ShootBarrage2Way()
     {
         float baseShootAngle = lastShootAngle;
-        float tmpAngle = baseShootAngle + (weapon_multishootArc / 2f);
+        float tmpAngle = weapon_multishootArc / 2f;
         int t = 0;
 
         if (weapon_multishoot > 1)
@@ -199,7 +228,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
 
             while (t < weapon_multishoot)
             {
-                CreateAttackBasedOnWeaponType(tmpAngle, GetLrForIndex(t));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle);
                 tmpAngle -= weapon_multishootArc / (weapon_multishoot - 1);
                 t++;
                 yield return new WaitForSeconds(SHOOT_SECUENCE_DELAY);
@@ -210,7 +239,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
 
             while (t >= 0)
             {
-                CreateAttackBasedOnWeaponType(tmpAngle, GetLrForIndex(t));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle);
                 tmpAngle += weapon_multishootArc / (weapon_multishoot - 1);
                 t--;
                 yield return new WaitForSeconds(SHOOT_SECUENCE_DELAY);
@@ -218,15 +247,15 @@ public class EntityNPC : MonoBehaviour, IEntity {
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
+            CreateAttackBasedOnWeaponType(baseShootAngle, 0);
 
         }
     }
     IEnumerator ShootBarrageCrossfull()
     {
         float baseShootAngle = lastShootAngle;
-        float tmpAngle1 = baseShootAngle + (weapon_multishootArc / 2f);
-        float tmpAngle2 = baseShootAngle - (weapon_multishootArc / 2f);
+        float tmpAngle1 = weapon_multishootArc / 2f;
+        float tmpAngle2 = -weapon_multishootArc / 2f;
         int i = 0;
 
         if (weapon_multishoot > 1)
@@ -234,8 +263,8 @@ public class EntityNPC : MonoBehaviour, IEntity {
 
             while (i < weapon_multishoot)
             {
-                CreateAttackBasedOnWeaponType(tmpAngle1, GetLrForIndex(i));
-                CreateAttackBasedOnWeaponType(tmpAngle2, -GetLrForIndex(i));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle1);
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle2);
 
                 tmpAngle1 -= weapon_multishootArc / (weapon_multishoot - 1);
                 tmpAngle2 += weapon_multishootArc / (weapon_multishoot - 1);
@@ -245,14 +274,14 @@ public class EntityNPC : MonoBehaviour, IEntity {
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
+            CreateAttackBasedOnWeaponType(baseShootAngle, 0);
         }
     }
     IEnumerator ShootBarrageCrosshalf()
     {
         float baseShootAngle = lastShootAngle;
-        float tmpAngle1 = baseShootAngle + (weapon_multishootArc / 2f);
-        float tmpAngle2 = baseShootAngle - (weapon_multishootArc / 2f);
+        float tmpAngle1 = weapon_multishootArc / 2f;
+        float tmpAngle2 = -weapon_multishootArc / 2f;
         int i = 0;
 
         if (weapon_multishoot > 1)
@@ -260,8 +289,8 @@ public class EntityNPC : MonoBehaviour, IEntity {
 
             while (i < (weapon_multishoot / 2))
             {
-                CreateAttackBasedOnWeaponType(tmpAngle1, GetLrForIndex(i));
-                CreateAttackBasedOnWeaponType(tmpAngle2, -GetLrForIndex(i));
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle1);
+                CreateAttackBasedOnWeaponType(baseShootAngle, tmpAngle2);
 
                 tmpAngle1 -= weapon_multishootArc / (weapon_multishoot - 1);
                 tmpAngle2 += weapon_multishootArc / (weapon_multishoot - 1);
@@ -269,54 +298,61 @@ public class EntityNPC : MonoBehaviour, IEntity {
                 yield return new WaitForSeconds(SHOOT_SECUENCE_DELAY);
             }
             if (weapon_multishoot % 2 != 0) {
-                CreateAttackBasedOnWeaponType(baseShootAngle);
+                CreateAttackBasedOnWeaponType(baseShootAngle, 0);
             }
         }
         else
         {
-            CreateAttackBasedOnWeaponType(baseShootAngle);
+            CreateAttackBasedOnWeaponType(baseShootAngle, 0);
         }
     }
-    private void CreateAttackBasedOnWeaponType(float degree, int lr = 0)
+    private void CreateAttackBasedOnWeaponType(float degree, float local)
     {
         switch (weapon_attackType)
         {
             case WeaponAttackType.beam:
                 {
-                    CreateBeam(degree);
+                    CreateBeam(degree, local);
                     break;
                 }
             case WeaponAttackType.projectile:
                 {
-                    CreateBullet(degree, lr);
+                    CreateBullet(degree, local);
                     break;
                 }
         }
     }
-    private void CreateBullet(float degree, int lr = 0)
+    private void CreateBullet(float degree, float local)
     {
         BulletBehaviour bullet;
         bullet = ObjectPool.currentInstance.GetBulletFromPool();
-        if (weapon_randomSpread > 0) bullet.SetBullet(transform.position, degree + Random.Range(-weapon_randomSpread, weapon_randomSpread), this, lr);
-        else bullet.SetBullet(transform.position, degree, this, lr);
+        if (weapon_randomSpread > 0) bullet.SetBullet(transform.position, degree + Random.Range(-weapon_randomSpread, weapon_randomSpread), local, this);
+        else bullet.SetBullet(transform.position, degree, local, this);
     }
-    private void CreateBeam(float degree)
+    private void CreateBeam(float degree, float local)
     {
         BeamBehaviour beam;
         beam = ObjectPool.currentInstance.GetBeamFromPool();
         if (weapon_randomSpread > 0) beam.SetBeam(this, transform.position, stat_bounces, degree + Random.Range(-weapon_randomSpread, weapon_randomSpread), entity_hitbox);
         else beam.SetBeam(this, transform.position, stat_bounces, degree, entity_hitbox);
     }
-    public void DealDamage(float amount, Enums.DamageType dmgType)
+    #endregion
+    #region Interface implementation and Getters
+    public void DealDamage(float amount, Enums.DamageType dmgType, IEntity dmgDealer)
     {
         amount *= (1 - stat_defense);
-        if (amount <= 0)
+        if (amount <= 0 || !gameObject.activeInHierarchy)
             return;
         if (amount < 1) amount = 1;
         entityAI.NotifyDamageTaken(amount);
 
         switch (dmgType)
         {
+            case Enums.DamageType.electricEffect:
+                {
+                    ObjectPool.currentInstance.GetSparkFromPool().SetupSpark(transform.position, 4, amount, dmgDealer);
+                    break;
+                }
             case Enums.DamageType.normal:
                 {
                     IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.normal, transform.position);
@@ -333,13 +369,15 @@ public class EntityNPC : MonoBehaviour, IEntity {
             case Enums.DamageType.cryo:
                 {
                     IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.cryo, transform.position);
-                    if (status_frozen < 100) {
+                    if (status_frozen < 100)
+                    {
                         status_frozen += amount * DAMAGE_TO_FROZEN_STATUS_RATE;
-                        if (status_frozen > 100) {
+                        if (status_frozen > 100)
+                        {
                             status_frozen = 100;
                             IngameHudManager.currentInstance.DisplayStatusNotification(Enums.StatusEffect.frozen, transform.position);
                         }
-                        
+
                     }
                     status_frozenRecoveryRate = 0;
                     if (!coRoutine_frozen)
@@ -347,61 +385,19 @@ public class EntityNPC : MonoBehaviour, IEntity {
                     SubstractHealthAndShield(amount, false);
                     break;
                 }
-            case Enums.DamageType.nuclear:
+            case Enums.DamageType.nuclearDamage:
                 {
-                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.nuclear, transform.position);
+                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.nuclearDamage, transform.position);
                     SubstractHealthAndShield(amount, true);
                     break;
                 }
-            case Enums.DamageType.electric:
+            case Enums.DamageType.electricDamage:
                 {
-                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.electric, transform.position);
+                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.electricDamage, transform.position);
                     SubstractHealthAndShield(amount, false);
                     break;
                 }
         }
-    }
-    IEnumerator FireDamageOverTime()
-    {
-        coRoutine_burning = true;
-        float burnAmount;
-
-        while (status_burning > 0)
-        {
-            burnAmount = (int)(status_burning / 10);
-            if (burnAmount < 1)
-                burnAmount = 1;
-            status_burning -= burnAmount;
-            IngameHudManager.currentInstance.DisplayDamageNotification(burnAmount, Enums.DamageType.photon, transform.position);
-            SubstractHealthAndShield(burnAmount, false);
-            yield return new WaitForSeconds(0.5f);
-        }
-        coRoutine_burning = false;
-    }
-    IEnumerator FrozenStatus() {
-        coRoutine_frozen = true;
-        float breakTimer = 0;
-        while (status_frozen > 0)
-        {
-            if (status_frozen >= 100) {
-                breakTimer = 5;
-                stat_defense -= 1;
-                while (breakTimer > 0) {
-                    breakTimer -= Time.deltaTime;
-                    yield return null;
-                }
-                stat_defense += 1;
-                status_frozen = 0;
-            }
-            else {
-                status_frozenRecoveryRate += Time.deltaTime * 2;
-                status_frozen -= Time.deltaTime * status_frozenRecoveryRate;
-                if (status_frozen < 0)
-                    status_frozen = 0;
-            }
-            yield return null;
-        }
-        coRoutine_frozen = false;
     }
     private void SubstractHealthAndShield(float dmg, bool ignoreShield)
     {
@@ -425,7 +421,6 @@ public class EntityNPC : MonoBehaviour, IEntity {
         }
 
     }
-    #region Interface Implementation
     public float GetPhysicalDamage() {
         return stat_damage_physical;
     }
@@ -463,14 +458,8 @@ public class EntityNPC : MonoBehaviour, IEntity {
     public float GetEntityTimescale() {
         return 1 - (status_frozen / 100f);
     }
-    public float GetTrajectoryHelix() {
-        return stat_trajectoryHelix;
-    }
-    public float GetTrajectoryWave() {
-        return stat_trajectoryWave;
-    }
-    public float GetTrajectoryTracking() {
-        return stat_trajectoryTrack;
+    public WeaponData.ProjectileTrajectory GetWeaponProjectileTrajectory() {
+        return weapon_trajectory;
     }
     public GameObject GetGameObject() {
         return gameObject;
@@ -487,6 +476,9 @@ public class EntityNPC : MonoBehaviour, IEntity {
     public float GetHealthPercent()
     {
         return currentHealth / stat_health;
+    }
+    public WeaponData.DamageElement GetDamageElement() {
+        return weapon_element;
     }
     #endregion
 }
