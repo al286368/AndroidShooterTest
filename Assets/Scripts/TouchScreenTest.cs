@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class TouchScreenTest : MonoBehaviour {
 
-    private float speed = 10;
     private Touch t;
 
 

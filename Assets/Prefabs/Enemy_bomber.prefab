@@ -111,7 +111,7 @@ MonoBehaviour:
   status_frozen: 0
   status_frozenRecoveryRate: 0
   status_burning: 0
-  stat_health: 2500
+  stat_health: 1500
   stat_shield: 0
   stat_defense: 0
   stat_damage_physical: 10

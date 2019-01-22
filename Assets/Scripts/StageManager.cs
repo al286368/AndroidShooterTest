@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class StageManager : MonoBehaviour {
 
@@ -11,8 +12,7 @@ public class StageManager : MonoBehaviour {
     public static StageManager currentInstance;
 
     public float difficultyBulletTimeScaleFactor = 0.3f;
-
-    public CanvasGroup LevelIntroCG;
+    private bool stageEnded = false;
 
 
     private void Awake()
@@ -23,7 +23,7 @@ public class StageManager : MonoBehaviour {
     }
     private void Start()
     {
-        DisplayLevelIntro();
+        IngameHudManager.currentInstance.DisplayLevelIntro();
     }
     #region Entity Management
     public void RegisterEnemy(EntityNPC e)
@@ -34,6 +34,13 @@ public class StageManager : MonoBehaviour {
     public void UnRegisterEnemy(EntityNPC e) {
         if (enemiesInStage.Contains(e))
             enemiesInStage.Remove(e);
+    }
+    public void EndStage(bool victory) {
+        if (stageEnded)
+            return;
+        stageEnded = true;
+        StartCoroutine("EndStageDelay");
+        IngameHudManager.currentInstance.DisplayLevelEnd(victory);
     }
     public IEntity GetClosestRivalEntityToPoint(Vector3 pos, IEntity user, IEntity optionalIgnoredEntity = null) {
         if (user.IsAlly())
@@ -137,33 +144,9 @@ public class StageManager : MonoBehaviour {
         NPCSpawned.ResetEntity();
     }
     #endregion
-    #region Visual Notifications Management
-    public void DisplayLevelIntro() {
-        StopCoroutine("HUD_LevelIntro");
-        StartCoroutine("HUD_LevelIntro");
+    IEnumerator EndStageDelay() {
+        yield return new WaitForSeconds(6);
+        SceneManager.LoadScene("MainMenu");
     }
-    IEnumerator HUD_LevelIntro()
-    {
-        float t = 0;
-        float animSpeed = 1;
-
-        LevelIntroCG.gameObject.SetActive(true);
-        LevelIntroCG.alpha = 0;
-        while (t < 1) {
-            t += Time.deltaTime * animSpeed;
-            LevelIntroCG.alpha = t;
-            yield return null;
-        }
-        yield return new WaitForSeconds(1);
-        animSpeed = 3;
-        while (t > 0) {
-            t -= Time.deltaTime * animSpeed;
-            LevelIntroCG.alpha = t;
-            LevelIntroCG.transform.localScale = new Vector3(1,1,1) * (1+(1-t));
-            yield return null;
-        }
-        LevelIntroCG.gameObject.SetActive(false);
-    }
-    #endregion
 
 }

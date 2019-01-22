@@ -51,16 +51,16 @@ public class WeaponData {
         weapon_critChance = 20;
         weapon_critMultiplier = 2;
         weapon_randomSpread = 0;
-        weapon_multishootAperture = 90;
-        weapon_multishoot = 1;
-        weapon_bounces = 8;
-        weapon_damage = 50;
+        weapon_multishootAperture = 130;
+        weapon_multishoot = 6;
+        weapon_bounces = 0;
+        weapon_damage = 80;
         weapon_projectileSpeed = 1f;
-        weapon_heat_per_projectile = 3;
-        weapon_shootSecuence = ShootSecuence.barrage_standard;
+        weapon_heat_per_projectile = 2.8f;
+        weapon_shootSecuence = ShootSecuence.normal;
         weapon_attackType = AttackType.projectile;
         weapon_element = DamageElement.nuclear;
-        weapon_projectile_trajectory = ProjectileTrajectory.binarytrack;
+        weapon_projectile_trajectory = ProjectileTrajectory.helix;
 
 		switch (stg) {
 		case WeaponGenerationSetting.playerWeapon:

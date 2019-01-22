@@ -27,7 +27,6 @@ public class AI_Drifter : MonoBehaviour, IEnemyAI
 
     private const float RETREAT_TIME = 12f;
 
-    private float findNextPositionTimer = 0;
     private float lifetime = 0;
 
 

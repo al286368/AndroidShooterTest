@@ -426,6 +426,8 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     public void Kill()
     {
         gameObject.SetActive(false);
+        StageManager.currentInstance.EndStage(false);
+        currentHealth = 0;
     }
 
     public float GetEntityTimescale()
@@ -436,8 +438,8 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     public void ResetEntity()
     {
         // TEST ONLY
-        playerWeaponData = new WeaponData(WeaponData.WeaponGenerationSetting.playerWeapon);
-        playerShipData = new ShipData();
+        playerWeaponData = GlobalGameManager.currentInstance.GetPlayerSelectedWeapon();
+        playerShipData = GlobalGameManager.currentInstance.GetPlayerSelectedShip(); 
         StageManager.currentInstance.RegisterPlayerEntity(this);
 
         currentHealth = playerShipData.GetShipEnergy();

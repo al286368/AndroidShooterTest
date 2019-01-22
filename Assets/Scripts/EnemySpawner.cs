@@ -25,6 +25,7 @@ public class EnemySpawner : MonoBehaviour {
             StageManager.currentInstance.SpawnDrifter(new Vector3(4, 18, 0));
             yield return new WaitForSeconds(3);
         }
-
+        yield return new WaitForSeconds(10);
+        StageManager.currentInstance.EndStage(true);
     }
 }

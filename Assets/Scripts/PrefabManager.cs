@@ -11,6 +11,7 @@ public class PrefabManager : MonoBehaviour {
 
     private void Awake()
     {
+        DontDestroyOnLoad(gameObject);
         currentInstance = this;
     }
 }

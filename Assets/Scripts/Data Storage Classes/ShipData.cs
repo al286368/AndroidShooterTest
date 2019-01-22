@@ -24,6 +24,7 @@ public class ShipData {
     public ShipData() {
         baseEnergy = 100;
         baseShield = 300;
+        baseDefense = 0;
         specialRechargeRate = 1;
         shieldRecoveryRate = 20;
         shieldRecoveryDelay = 2;
