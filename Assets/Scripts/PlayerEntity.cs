@@ -13,6 +13,8 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     public float status_frozen;
     public float status_burning;
 
+    private ISpecial specialInUse;
+
     private bool coRoutine_burning = false;
     private bool overheat = false;
 
@@ -58,6 +60,12 @@ public class PlayerEntity : MonoBehaviour, IEntity {
             tmpWeaponHeat = 100;
             overheat = true;
             tmpHeatRecoveryReady = 0;
+        }
+    }
+    public void UseSpecial() {
+        if (SpecialReady()) {
+            specialInUse.ActivateEffect(this);
+            tmpSpecialReady = 0;
         }
     }
     #region Shooting Methods
@@ -440,10 +448,13 @@ public class PlayerEntity : MonoBehaviour, IEntity {
         // TEST ONLY
         playerWeaponData = GlobalGameManager.currentInstance.GetPlayerSelectedWeapon();
         playerShipData = GlobalGameManager.currentInstance.GetPlayerSelectedShip(); 
+
         StageManager.currentInstance.RegisterPlayerEntity(this);
 
         currentHealth = playerShipData.GetShipEnergy();
         currentShield = playerShipData.GetShipShield();
+
+        InstantiateSpecial();
         
     }
 
@@ -491,6 +502,24 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     }
     public bool SpecialReady() {
         return tmpSpecialReady >= 100;
+    }
+    #endregion
+    #region Specials Instantiation
+    public void InstantiateSpecial() {
+        if (specialInUse != null)
+            Destroy(specialInUse.GetGameObject());
+
+        GameObject instSpecial;
+
+        switch (playerShipData.GetSpecial()) {
+            default:
+                {
+                    instSpecial = Instantiate(PrefabManager.currentInstance.special_deflectPulse) as GameObject;
+                    break;
+                }
+        }
+        instSpecial.SetActive(false);
+        specialInUse = instSpecial.GetComponent<ISpecial>();
     }
     #endregion
 }

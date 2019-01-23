@@ -1055,7 +1055,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Alpha version - V0.02
+  m_Text: Alpha version - V0.03
 --- !u!222 &453533675
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1190,6 +1190,8 @@ MonoBehaviour:
   enemy_drifter: {fileID: 1050385949760122, guid: 683c40fbe6c4e0141ad96c17490c5024,
     type: 2}
   enemy_bomber: {fileID: 1064759630381632, guid: 60e58f9c796c6fc449d69230832e37b5,
+    type: 2}
+  special_deflectPulse: {fileID: 1458659223917196, guid: 9151b6d4a6ce1ae4b8cb4a881d23ff0e,
     type: 2}
 --- !u!4 &506935503
 Transform:
@@ -4169,6 +4171,12 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 114742131436919668, guid: cfbcb1c6f73192d40a5cdf934f05af86,
+        type: 2}
+      propertyPath: special_deflectPulse
+      value: 
+      objectReference: {fileID: 1458659223917196, guid: 9151b6d4a6ce1ae4b8cb4a881d23ff0e,
+        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cfbcb1c6f73192d40a5cdf934f05af86, type: 2}
   m_IsPrefabAsset: 0

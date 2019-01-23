@@ -18,6 +18,8 @@ public class ShipData {
     private float heatRecovery;
     private int upgradeSlots;
 
+    private Enums.PlayerSpecials special;
+
     private List<Upgrade> upgradesInstalled;
     private List<Trait> baseTraits;
 
@@ -25,11 +27,12 @@ public class ShipData {
         baseEnergy = 100;
         baseShield = 300;
         baseDefense = 0;
-        specialRechargeRate = 1;
+        specialRechargeRate = 50;
         shieldRecoveryRate = 20;
         shieldRecoveryDelay = 2;
         heatRecovery = 10;
         upgradeSlots = 5;
+        special = Enums.PlayerSpecials.deflectPulse;
     }
 
     public int GetShipEnergy()
@@ -59,5 +62,9 @@ public class ShipData {
     }
     public float GetHeatRecovery() {
         return heatRecovery;
+    }
+    public Enums.PlayerSpecials GetSpecial()
+    {
+        return special;
     }
 }

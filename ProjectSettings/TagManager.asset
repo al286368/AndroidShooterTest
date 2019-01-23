@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Border
   - Entity
+  - Deflect
   layers:
   - Default
   - TransparentFX

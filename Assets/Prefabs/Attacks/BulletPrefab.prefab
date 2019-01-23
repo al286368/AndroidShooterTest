@@ -218,6 +218,7 @@ GameObject:
   - component: {fileID: 114511695501755136}
   - component: {fileID: 114495250264712876}
   - component: {fileID: 114978947534250434}
+  - component: {fileID: 114957672547102956}
   m_Layer: 9
   m_Name: BulletPrefab
   m_TagString: Untagged
@@ -466,7 +467,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1731816519922336}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.07, y: -2.71, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4202792186526778}
@@ -1353,9 +1354,21 @@ MonoBehaviour:
   - {fileID: 114001868045833270}
   - {fileID: 114627953847453126}
   traj_normal: {fileID: 114253766491235560}
+  traj_deflect: {fileID: 114957672547102956}
   traj_helix: {fileID: 114511695501755136}
   traj_tracking: {fileID: 114495250264712876}
   traj_binarytrack: {fileID: 114978947534250434}
+--- !u!114 &114957672547102956
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1731816519922336}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50a308171fd0c5f4f835a4734bf133ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114978947534250434
 MonoBehaviour:
   m_ObjectHideFlags: 1

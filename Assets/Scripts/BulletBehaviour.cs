@@ -19,6 +19,7 @@ public class BulletBehaviour : MonoBehaviour {
 
     private float tmp_bounceCooldown = 0;
     private float tmp_backToPoolDelay = 0;
+    private DeflecterProperties lastDeflectTouched;
     private bool waitingToRecycle = false;
 
     private IEntity entity_user;
@@ -34,6 +35,7 @@ public class BulletBehaviour : MonoBehaviour {
 
     [Header("Trajectory Managers (TEMP?)")]
     public TrajectoryNormal traj_normal;
+    public TrajectoryDeflected traj_deflect;
     public TrajectoryHelix traj_helix;
     public TrajectoryTracking traj_tracking;
     public TrajectoryBinarytrack traj_binarytrack;
@@ -118,6 +120,7 @@ public class BulletBehaviour : MonoBehaviour {
         traj_helix.enabled = false;
         traj_tracking.enabled = false;
         traj_binarytrack.enabled = false;
+        traj_deflect.enabled = false;
 
         switch (newTrajectory) {
             case WeaponData.ProjectileTrajectory.helix:
@@ -135,6 +138,10 @@ public class BulletBehaviour : MonoBehaviour {
                 {
 
                     trajectoryInUse = traj_binarytrack;
+                    break;
+                }
+            case WeaponData.ProjectileTrajectory.deflected: {
+                    trajectoryInUse = traj_deflect;
                     break;
                 }
             default:
@@ -168,6 +175,7 @@ public class BulletBehaviour : MonoBehaviour {
     private void ResetBullet()
     {
         tmp_bounceCooldown = 0;
+        lastDeflectTouched = null;
         gameObject.SetActive(true);
         waitingToRecycle = false;
         hitboxParent.gameObject.SetActive(true);
@@ -185,6 +193,18 @@ public class BulletBehaviour : MonoBehaviour {
         if (collision.gameObject.tag == "Border")
         {
             WallCollision(collision);
+        }
+        if (collision.gameObject.tag == "Deflect")
+        {
+            lastDeflectTouched = collision.gameObject.GetComponent<DeflecterProperties>();
+
+            if (lastDeflectTouched != null) {
+                if (lastDeflectTouched.GetUser().IsAlly() != IsAlly()) {
+                    isAlly = !isAlly;
+                    SetNewTrajectory(WeaponData.ProjectileTrajectory.deflected);
+                }
+            }
+
         }
         if (collision.gameObject.tag != "Entity")
             return;
@@ -279,5 +299,8 @@ public class BulletBehaviour : MonoBehaviour {
             return property_speedScale * StageManager.currentInstance.difficultyBulletTimeScaleFactor;
         }
 
+    }
+    public DeflecterProperties GetLastDeflecterTouched() {
+        return lastDeflectTouched;
     }
 }

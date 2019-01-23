@@ -14,7 +14,7 @@ public class WeaponData {
 	}
     public enum ProjectileTrajectory
     {
-        normal, helix, tracking, binarytrack, delayedTracking, wave
+        normal, deflected, helix, tracking, binarytrack, delayedTracking, wave
     }
     public enum DamageElement
 	{
