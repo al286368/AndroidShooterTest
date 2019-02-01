@@ -479,6 +479,14 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     public WeaponData.DamageElement GetDamageElement() {
         return playerWeaponData.GetWeaponElement();
     }
+    public float GetCritChance()
+    {
+        return playerWeaponData.GetCritChance();
+    }
+    public float GetCritMultiplier()
+    {
+        return playerWeaponData.GetCritMultiplier();
+    }
     #endregion
     #region Player Entity Getters
     public float GetWeaponHeat() {

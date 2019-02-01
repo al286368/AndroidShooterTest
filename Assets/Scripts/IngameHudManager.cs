@@ -127,9 +127,9 @@ public class IngameHudManager : MonoBehaviour {
     {
         GetNotificationFromPool().SetAsStatus(effect, worldpos);
     }
-    public void DisplayDamageNotification(float dmg, Enums.DamageType type, Vector3 worldpos)
+    public void DisplayDamageNotification(float dmg, bool crit, Enums.DamageType type, Vector3 worldpos)
     {
-        GetNotificationFromPool().SetAsDamage(dmg, type, worldpos);
+        GetNotificationFromPool().SetAsDamage(dmg, crit, type, worldpos);
     }
     #endregion
     #region HUD Animation Co-Routines

@@ -86,7 +86,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
             if (burnAmount < 1)
                 burnAmount = 1;
             status_burning -= burnAmount;
-            IngameHudManager.currentInstance.DisplayDamageNotification(burnAmount, Enums.DamageType.photon, transform.position);
+            IngameHudManager.currentInstance.DisplayDamageNotification(burnAmount,false, Enums.DamageType.photon, transform.position);
             SubstractHealthAndShield(burnAmount, false);
             yield return new WaitForSeconds(0.5f);
         }
@@ -343,6 +343,14 @@ public class EntityNPC : MonoBehaviour, IEntity {
         amount *= (1 - stat_defense);
         if (amount <= 0 || !gameObject.activeInHierarchy)
             return;
+
+        bool isCrit = false;
+        if (Random.Range(1, 101) < dmgDealer.GetCritChance() && dmgType != Enums.DamageType.electricEffect)
+        {
+            amount *= dmgDealer.GetCritMultiplier();
+            isCrit = true;
+        }
+
         if (amount < 1) amount = 1;
         entityAI.NotifyDamageTaken(amount);
 
@@ -355,7 +363,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
                 }
             case Enums.DamageType.normal:
                 {
-                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.normal, transform.position);
+                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, isCrit, Enums.DamageType.normal, transform.position);
                     SubstractHealthAndShield(amount, false);
                     break;
                 }
@@ -368,7 +376,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
                 }
             case Enums.DamageType.cryo:
                 {
-                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.cryo, transform.position);
+                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, isCrit, Enums.DamageType.cryo, transform.position);
                     if (status_frozen < 100)
                     {
                         status_frozen += amount * DAMAGE_TO_FROZEN_STATUS_RATE;
@@ -387,13 +395,13 @@ public class EntityNPC : MonoBehaviour, IEntity {
                 }
             case Enums.DamageType.nuclearDamage:
                 {
-                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.nuclearDamage, transform.position);
+                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, isCrit, Enums.DamageType.nuclearDamage, transform.position);
                     SubstractHealthAndShield(amount, true);
                     break;
                 }
             case Enums.DamageType.electricDamage:
                 {
-                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, Enums.DamageType.electricDamage, transform.position);
+                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, isCrit, Enums.DamageType.electricDamage, transform.position);
                     SubstractHealthAndShield(amount, false);
                     break;
                 }
@@ -479,6 +487,15 @@ public class EntityNPC : MonoBehaviour, IEntity {
     }
     public WeaponData.DamageElement GetDamageElement() {
         return weapon_element;
+    }
+    public float GetCritChance()
+    {
+        return 0;
+    }
+
+    public float GetCritMultiplier()
+    {
+        return 1;
     }
     #endregion
 }

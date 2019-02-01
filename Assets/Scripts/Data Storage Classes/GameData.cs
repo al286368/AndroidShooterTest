@@ -13,14 +13,25 @@ public class GameData {
     private bool settings_musicEnabled;
     private bool settings_particlesEnabled;
 
+    private List<WeaponData> data_weaponInventory; 
+
     public GameData() {
+        data_weaponInventory = new List<WeaponData>();
         playerSelectedShip = new ShipData();
-        playerSelectedWeapon = new WeaponData(WeaponData.WeaponGenerationSetting.playerWeapon);
+        for (int i = 0; i < 30; i++)
+        {
+            AddWeaponToInventory(new WeaponData(2.25f));
+        }
+        playerSelectedWeapon = data_weaponInventory[0];
+
         settings_dmgNumbersEnabled = true;
         settings_hudShakeEnabled = true;
         settings_soundEnabled = true;
         settings_musicEnabled = true;
         settings_particlesEnabled = true;
+    }
+    public void SetNewPlayerSelectedWeapon(WeaponData newWd) {
+        playerSelectedWeapon = newWd;
     }
     public ShipData GetPlayerSelectedShip() {
         return playerSelectedShip;
@@ -58,6 +69,34 @@ public class GameData {
     }
     public void SetSettingSound(bool stg) {
         settings_soundEnabled = stg;
+    }
+    public int GetAmountOfWeaponsInInventory() {
+        return data_weaponInventory.Count;
+    }
+    public WeaponData GetWeaponInInventorySlot(int index) {
+        if (index >= data_weaponInventory.Count)
+        {
+            return null;
+        }
+        return data_weaponInventory[index];
+    }
+    public void AddWeaponToInventory(WeaponData wpn) {
+        data_weaponInventory.Add(wpn);
+    }
+    #endregion
+    #region InventorySorting
+    public void SortWeaponInventoryByLevel()
+    {
+        data_weaponInventory.Sort(WeaponData.CompareByLevel);
+    }
+    public void SortWeaponInventoryByElement()
+    {
+        data_weaponInventory.Sort(WeaponData.CompareByElement);
+    }
+    public void SortWeaponInventoryByRarity()
+    {
+        data_weaponInventory.Sort(WeaponData.CompareByRarity);
+        data_weaponInventory.Reverse();
     }
     #endregion
 

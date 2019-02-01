@@ -80,7 +80,7 @@ public class BulletBehaviour : MonoBehaviour {
 
         switch (entity_user.GetDamageElement())
         {
-            case WeaponData.DamageElement.physical:
+            case WeaponData.DamageElement.pulse:
                 {
                     BVMInUse = visualParents[0];
                     visualParents[0].gameObject.SetActive(true);

@@ -9,9 +9,12 @@ public class MainMenuManager : MonoBehaviour {
     public MenuState currentState = MenuState.mainMenu;
 
     public SettingsMenuManager SMM;
+    public WeaponInventoryManager WIM;
 
     [Header ("Canvas Group")]
     public CanvasGroup ConfirmQuitCG;
+
+    public static MainMenuManager currentInstance;
 
 
     public enum MenuState {
@@ -20,6 +23,10 @@ public class MainMenuManager : MonoBehaviour {
         inventory,
         settings,
         profile,
+    }
+    private void Awake()
+    {
+        currentInstance = this;
     }
 
     #region Button Click Handlers
@@ -45,6 +52,8 @@ public class MainMenuManager : MonoBehaviour {
     public void OnInventoryClick() {
         if (currentState != MenuState.mainMenu)
             return;
+        currentState = MenuState.inventory;
+        WIM.OpenMenu();
     }
     public void OnPlayClick() {
         if (currentState != MenuState.mainMenu)
@@ -67,6 +76,9 @@ public class MainMenuManager : MonoBehaviour {
             return;
         currentState = MenuState.mainMenu;
         SMM.CloseMenu();
+    }
+    public void OnExitInventoryClick() {
+        currentState = MenuState.mainMenu;
     }
     #endregion
 }

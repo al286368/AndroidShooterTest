@@ -17,6 +17,8 @@ public interface IEntity {
     float GetBulletSpeedScale();
     float GetHealthPercent();
     float GetEntityTimescale();
+    float GetCritChance();
+    float GetCritMultiplier();
 
     int GetBulletBounces();
 
