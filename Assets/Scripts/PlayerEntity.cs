@@ -26,7 +26,7 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     private float lastShootAngle = 0;
     private float shieldRecoverReady = 0;
 
-    private const float SHOOT_SECUENCE_DELAY = 0.05f;
+    private const float SHOOT_SECUENCE_DELAY = 0.1f;
     private const float OVERHEAT_RECOVERY_DELAY = 1;
 
     void Start() {
@@ -392,6 +392,9 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     public float GetPhysicalDamage()
     {
         return playerWeaponData.GetPhysicalDamage();
+    }
+    public float GetPlasmaDamage() {
+        return playerWeaponData.GetPlasmaDamage();
     }
     public int GetMultishoot()
     {

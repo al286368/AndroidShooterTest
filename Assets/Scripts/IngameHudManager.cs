@@ -140,7 +140,7 @@ public class IngameHudManager : MonoBehaviour {
             if (t < 1)
             {
                 t = Mathf.MoveTowards(t, 1, Time.deltaTime * blinkSpeed);
-                heatBlink.transform.localScale = new Vector3(1 + t * 0.2f, 1 + t, 1);
+                heatBlink.transform.localScale = new Vector3(1 + t * 0.2f, 1 + t * 2, 1);
                 heatBlink.alpha = (1 - t) * 0.6f;
             }
             else {
@@ -162,7 +162,7 @@ public class IngameHudManager : MonoBehaviour {
             if (t < 1)
             {
                 t = Mathf.MoveTowards(t, 1, Time.deltaTime * blinkSpeed);
-                specialBlink.transform.localScale = new Vector3(1 + t * 0.2f, 1 + t, 1);
+                specialBlink.transform.localScale = new Vector3(1 + t * 0.2f, 1 + t * 2, 1);
                 specialBlink.alpha = (1 - t) * 0.6f;
             }
             else

@@ -7,9 +7,7 @@ public class WeaponInventoryElement : MonoBehaviour {
 
     public Text levelText;
     public Text nameText;
-    public Text elementText;
     public Text damageText;
-    public Text dpsText;
     public int index;
 
     private WeaponData wd_stored;
@@ -45,18 +43,7 @@ public class WeaponInventoryElement : MonoBehaviour {
     public void SetTexts() {
         levelText.text = wd_stored.GetUpgradeLevel().ToString();
         nameText.text = wd_stored.GetWeaponName();
-        damageText.text = wd_stored.GetWeaponDamage().ToString() + "(x" + wd_stored.GetMultishoot() + ")";
-        dpsText.text = wd_stored.GetDps().ToString("F1");
-        switch (wd_stored.GetWeaponElement()) {
-            case WeaponData.DamageElement.cryo: { elementText.text = "Cryo weapon"; break; }
-            case WeaponData.DamageElement.photon: { elementText.text = "Photon weapon"; break; }
-            case WeaponData.DamageElement.nuclear: { elementText.text = "Nuclear weapon"; break; }
-            case WeaponData.DamageElement.plasma: { elementText.text = "Plasma weapon"; break; }
-            case WeaponData.DamageElement.gamma: { elementText.text = "Gamma weapon"; break; }
-            case WeaponData.DamageElement.electric: { elementText.text = "Electric weapon"; break; }
-            default: { elementText.text = "Pulse weapon"; break; }
-        }
-
+        damageText.text = wd_stored.GetWeaponDamage().ToString() + " x" + wd_stored.GetMultishoot() + "";
     }
     public void SetElementBackground() {
         pulseBackground.gameObject.SetActive(wd_stored.GetWeaponElement() == WeaponData.DamageElement.pulse);

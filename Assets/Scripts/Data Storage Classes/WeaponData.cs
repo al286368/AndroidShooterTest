@@ -53,11 +53,11 @@ public class WeaponData {
     public static float WEAPON_BASE_FIRERATE = 5;
 
     public static float ELEM_PULSE_DMGMULT = 1f;
-    public static float ELEM_PHOTON_DMGMULT = 0.5f;
+    public static float ELEM_PHOTON_DMGMULT = 0.3f;
     public static float ELEM_NUCLEAR_DMGMULT = 0.75f;
-    public static float ELEM_CRYO_DMGMULT = 0.65f;
+    public static float ELEM_CRYO_DMGMULT = 0.5f;
     public static float ELEM_ELECTRIC_DMGMULT = 0.3f;
-    public static float ELEM_PLASMA_DMGMULT = 0.5f;
+    public static float ELEM_PLASMA_DMGMULT = 0.65f;
     public static float ELEM_GAMMA_DMGMULT = 1.25f;
 
 
@@ -79,11 +79,12 @@ public class WeaponData {
         SetRandomLevel(rewardM);
         SetRandomShootSecuence();
         SetRandomTrajectoryAndMultishoot();
+        SetDamage();
         SetDpsStats();
     }
     #region Generation Functions
     public void SetRandomAvailableElement() {
-        int variation = Random.Range(1, 6);
+        int variation = Random.Range(1, 7);
         switch (variation)
         {
             case 2:
@@ -262,7 +263,30 @@ public class WeaponData {
                     break;
                 }
         }
-        weapon_multishootAperture = Random.Range(1f, 2.5f) * 10 * weapon_multishoot;
+        switch (weapon_projectile_trajectory)
+        {
+            case ProjectileTrajectory.binarytrack:
+                {
+                    weapon_multishootAperture = Random.Range(1f, 2.5f) * 10 * weapon_multishoot;
+                    break;
+                }
+            case ProjectileTrajectory.helix:
+                {
+                    weapon_multishootAperture = Random.Range(1f, 2.5f) * 9f * weapon_multishoot;
+                    break;
+                }
+            case ProjectileTrajectory.tracking:
+                {
+                    weapon_multishootAperture = Random.Range(1f, 2.5f) * 8f * weapon_multishoot;
+                    break;
+                }
+            default:
+                {
+                    weapon_multishootAperture = Random.Range(1f, 2.5f) * 3.5f * weapon_multishoot;
+                    break;
+                }
+
+        }
     }
     public void SetDpsStats() {
         if (weapon_multishoot == 1)
@@ -286,49 +310,42 @@ public class WeaponData {
         switch (weapon_element) {
             case DamageElement.gamma:
                 {
-                    weapon_damage = WEAPON_BASE_DAMAGE * ELEM_GAMMA_DMGMULT;
                     weapon_heat_per_projectile = 2.8f;
                     weapon_critChance = 0;
                     break;
                 }
             case DamageElement.plasma:
                 {
-                    weapon_damage = WEAPON_BASE_DAMAGE * ELEM_PLASMA_DMGMULT;
                     weapon_heat_per_projectile = 2.65f;
                     weapon_critChance = Random.Range(40, 61);
                     break;
                 }
             case DamageElement.photon:
                 {
-                    weapon_damage = WEAPON_BASE_DAMAGE * ELEM_PHOTON_DMGMULT;
                     weapon_heat_per_projectile = 2.65f;
                     weapon_critChance = Random.Range(40, 61);
                     break;
                 }
             case DamageElement.nuclear:
                 {
-                    weapon_damage = WEAPON_BASE_DAMAGE * ELEM_NUCLEAR_DMGMULT;
                     weapon_heat_per_projectile = 2.65f;
                     weapon_critChance = 0;
                     break;
                 }
             case DamageElement.electric:
                 {
-                    weapon_damage = WEAPON_BASE_DAMAGE * ELEM_ELECTRIC_DMGMULT;
                     weapon_heat_per_projectile = 2.5f;
                     weapon_critChance = Random.Range(5, 21);
                     break;
                 }
             case DamageElement.cryo:
                 {
-                    weapon_damage = WEAPON_BASE_DAMAGE * ELEM_CRYO_DMGMULT;
                     weapon_heat_per_projectile = 2f;
                     weapon_critChance = Random.Range(20, 31);
                     break;
                 }
             default:
                 {
-                    weapon_damage = WEAPON_BASE_DAMAGE * ELEM_PULSE_DMGMULT;
                     weapon_heat_per_projectile = 2.5f;
                     weapon_critChance = Random.Range(20, 31);
                     break;
@@ -338,6 +355,46 @@ public class WeaponData {
             weapon_critMultiplier = 1 + (35 / weapon_critChance);
         else
             weapon_critMultiplier = 1;
+    }
+    public void SetDamage() {
+        switch (weapon_element)
+        {
+            case DamageElement.gamma:
+                {
+                    weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_GAMMA_DMGMULT);
+                    break;
+                }
+            case DamageElement.plasma:
+                {
+                    weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_PLASMA_DMGMULT);
+                    break;
+                }
+            case DamageElement.photon:
+                {
+                    weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_PHOTON_DMGMULT);
+                    break;
+                }
+            case DamageElement.nuclear:
+                {
+                    weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_NUCLEAR_DMGMULT);
+                    break;
+                }
+            case DamageElement.electric:
+                {
+                    weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_ELECTRIC_DMGMULT);
+                    break;
+                }
+            case DamageElement.cryo:
+                {
+                    weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_CRYO_DMGMULT);
+                    break;
+                }
+            default:
+                {
+                    weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_PULSE_DMGMULT);
+                    break;
+                }
+        }
     }
     #endregion
     #region Atribute Getters
@@ -410,6 +467,13 @@ public class WeaponData {
         else
             return 0;
     }
+    public float GetPlasmaDamage()
+    {
+        if (weapon_element == DamageElement.plasma)
+            return (WEAPON_BASE_DAMAGE + weapon_upgLevel * WEAPON_BASE_SCALING_PER_LEVEL) * ELEM_PLASMA_DMGMULT;
+        else
+            return 0;
+    }
     public float GetProjectileSpeed() {
         return weapon_projectileSpeed;
     }
@@ -432,13 +496,26 @@ public class WeaponData {
         return weapon_damage * weapon_multishoot * weapon_firerate;
     }
     #endregion
+    #region Weapon Interaction And Modification
+    public void LevelUp() {
+        weapon_upgLevel++;
+        if (weapon_upgLevel > 99)
+            weapon_upgLevel = 99;
+        SetDamage();
+    }
+    #endregion
     #region Comparators
-    // Sort by level, if equal, sort by rarity.
+    // Sort by Level -> Rarity -> Element
     public static int CompareByLevel(WeaponData w1, WeaponData w2) {
         if (w1.GetUpgradeLevel() == w2.GetUpgradeLevel()) {
             if (w1.GetWeaponRarity() == w2.GetWeaponRarity())
             {
-                return 0;
+                if (w1.GetWeaponElement() == w2.GetWeaponElement())
+                    return 0;
+                if (w1.GetWeaponElement() < w2.GetWeaponElement())
+                    return -1;
+                else
+                    return 1;
             }
             if (w1.GetWeaponRarity() < w2.GetWeaponRarity())
                 return -1;
@@ -448,7 +525,7 @@ public class WeaponData {
             return -1;
         return 1;
     }
-    // Sort by element, if equal, sort by rarity, if equal, sort by level.
+    // Sort by Element -> Rarity -> Level
     public static int CompareByElement(WeaponData w1, WeaponData w2)
     {
         if (w1.GetWeaponElement() == w2.GetWeaponElement()) {
@@ -468,16 +545,21 @@ public class WeaponData {
             return -1;
         return 1;
     }
-    // Sort by rarity, if equal, sort by level.
+    // Sort by Rarity -> Level -> Element
     public static int CompareByRarity(WeaponData w1, WeaponData w2) {
         if (w1.GetWeaponRarity() == w2.GetWeaponRarity()) {
-            if (w1.GetUpgradeLevel() == w2.GetUpgradeLevel())
-                return 0;
+            if (w1.GetUpgradeLevel() == w2.GetUpgradeLevel()) {
+                if (w1.GetWeaponElement() == w2.GetWeaponElement())
+                    return 0;
+                if (w1.GetWeaponElement() < w2.GetWeaponElement())
+                    return -1;
+                else
+                    return 1;
+            }    
             if (w1.GetUpgradeLevel() < w2.GetUpgradeLevel())
                 return -1;
             return 1;
         }
-
         if (w1.GetWeaponRarity() < w2.GetWeaponRarity())
             return -1;
         return 1;

@@ -72,6 +72,11 @@ public class NotificationBehaviour : MonoBehaviour {
                     notificationText.color = Color.red;
                     break;
                 }
+            case Enums.DamageType.plasma:
+                {
+                    notificationText.color = new Color(1, 0, 0.5f);
+                    break;
+                }
         }
     }
 	// Update is called once per frame
