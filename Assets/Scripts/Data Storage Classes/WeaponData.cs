@@ -49,14 +49,15 @@ public class WeaponData {
     private Rarity weapon_rarity;
 
 	public static float WEAPON_BASE_DAMAGE = 100;
+    public static float WEAPON_BASE_HEAT_PER_SHOOT = 1.8f;
     public static float WEAPON_BASE_SCALING_PER_LEVEL = 2.5f;
     public static float WEAPON_BASE_FIRERATE = 5;
 
     public static float ELEM_PULSE_DMGMULT = 1f;
-    public static float ELEM_PHOTON_DMGMULT = 0.3f;
+    public static float ELEM_PHOTON_DMGMULT = 0.4f;
     public static float ELEM_NUCLEAR_DMGMULT = 0.75f;
     public static float ELEM_CRYO_DMGMULT = 0.5f;
-    public static float ELEM_ELECTRIC_DMGMULT = 0.3f;
+    public static float ELEM_ELECTRIC_DMGMULT = 0.2f;
     public static float ELEM_PLASMA_DMGMULT = 0.65f;
     public static float ELEM_GAMMA_DMGMULT = 1.25f;
 
@@ -272,7 +273,7 @@ public class WeaponData {
                 }
             case ProjectileTrajectory.helix:
                 {
-                    weapon_multishootAperture = Random.Range(1f, 2.5f) * 9f * weapon_multishoot;
+                    weapon_multishootAperture = Random.Range(1f, 1.5f) * 15f * weapon_multishoot;
                     break;
                 }
             case ProjectileTrajectory.tracking:
@@ -286,6 +287,26 @@ public class WeaponData {
                     break;
                 }
 
+        }
+    }
+
+    // UNUSED
+    public void SetRandomWeaponType() {
+        int variation = Random.Range(1, 11);
+        switch (variation) {
+            case 1: // Low precision gatling
+                {
+                    break;
+                }
+            case 2: // Spread pattern
+                {
+                    break;
+                }
+            default: // 
+                {
+
+                    break;
+                }
         }
     }
     public void SetDpsStats() {
@@ -310,49 +331,49 @@ public class WeaponData {
         switch (weapon_element) {
             case DamageElement.gamma:
                 {
-                    weapon_heat_per_projectile = 2.8f;
+                    weapon_heat_per_projectile = 1.5f * WEAPON_BASE_HEAT_PER_SHOOT;
                     weapon_critChance = 0;
                     break;
                 }
             case DamageElement.plasma:
                 {
-                    weapon_heat_per_projectile = 2.65f;
+                    weapon_heat_per_projectile = 1.45f * WEAPON_BASE_HEAT_PER_SHOOT;
                     weapon_critChance = Random.Range(40, 61);
                     break;
                 }
             case DamageElement.photon:
                 {
-                    weapon_heat_per_projectile = 2.65f;
+                    weapon_heat_per_projectile = 1.4f * WEAPON_BASE_HEAT_PER_SHOOT;
                     weapon_critChance = Random.Range(40, 61);
                     break;
                 }
             case DamageElement.nuclear:
                 {
-                    weapon_heat_per_projectile = 2.65f;
+                    weapon_heat_per_projectile = 1.3f * WEAPON_BASE_HEAT_PER_SHOOT;
                     weapon_critChance = 0;
                     break;
                 }
             case DamageElement.electric:
                 {
-                    weapon_heat_per_projectile = 2.5f;
+                    weapon_heat_per_projectile = 1.25f * WEAPON_BASE_HEAT_PER_SHOOT;
                     weapon_critChance = Random.Range(5, 21);
                     break;
                 }
             case DamageElement.cryo:
                 {
-                    weapon_heat_per_projectile = 2f;
+                    weapon_heat_per_projectile = 1.1f * WEAPON_BASE_HEAT_PER_SHOOT;
                     weapon_critChance = Random.Range(20, 31);
                     break;
                 }
             default:
                 {
-                    weapon_heat_per_projectile = 2.5f;
+                    weapon_heat_per_projectile = 1.25f * WEAPON_BASE_HEAT_PER_SHOOT;
                     weapon_critChance = Random.Range(20, 31);
                     break;
                 }
         }
         if (CanCrit())
-            weapon_critMultiplier = 1 + (35 / weapon_critChance);
+            weapon_critMultiplier = 1 + (20 / weapon_critChance);
         else
             weapon_critMultiplier = 1;
     }

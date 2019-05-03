@@ -20,14 +20,15 @@ public class PlayerEntity : MonoBehaviour, IEntity {
 
     private float tmpShootReady = 0;
     private float tmpWeaponHeat = 0;
-    private float tmpHeatRecoveryReady = 0;
+    private float tmpHeatRecoveryStrenght = 0;
     private float tmpSpecialReady = 0;
 
     private float lastShootAngle = 0;
     private float shieldRecoverReady = 0;
 
     private const float SHOOT_SECUENCE_DELAY = 0.1f;
-    private const float OVERHEAT_RECOVERY_DELAY = 1;
+    private const float HEAT_RECOVERY_RAMPUP = 1.35f;
+    private const float HEAT_RECOVERY_ON_OVERHEAT = 1.35f;
 
     void Start() {
         ResetEntity();
@@ -40,14 +41,18 @@ public class PlayerEntity : MonoBehaviour, IEntity {
         tmpShootReady += Time.deltaTime * GetWeaponFirerate();
         tmpSpecialReady = Mathf.MoveTowards(tmpSpecialReady, 100, Time.deltaTime * playerShipData.GetSpecialRechargeRate());
 
-        if (tmpHeatRecoveryReady >= OVERHEAT_RECOVERY_DELAY)
+
+        tmpWeaponHeat = Mathf.MoveTowards(tmpWeaponHeat, 0, Time.deltaTime * playerShipData.GetHeatRecovery() * tmpHeatRecoveryStrenght);
+        if (overheat && tmpWeaponHeat == 0)
         {
-            tmpWeaponHeat = Mathf.MoveTowards(tmpWeaponHeat, 0, Time.deltaTime * playerShipData.GetHeatRecovery());
-            if (overheat && tmpWeaponHeat == 0)
+            tmpHeatRecoveryStrenght = HEAT_RECOVERY_ON_OVERHEAT;
+            if (tmpWeaponHeat == 0)
                 overheat = false;
         }
-        else
-            tmpHeatRecoveryReady += Time.deltaTime;
+        else {
+            tmpHeatRecoveryStrenght += Time.deltaTime * HEAT_RECOVERY_RAMPUP;
+        }
+
 
         if (shieldRecoverReady > 0)
             shieldRecoverReady -= Time.deltaTime;
@@ -56,10 +61,10 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     }
     public void IncreaseWeaponHeat(float amount) {
         tmpWeaponHeat += amount;
+        tmpHeatRecoveryStrenght = 0;
         if (tmpWeaponHeat > 100) {
             tmpWeaponHeat = 100;
             overheat = true;
-            tmpHeatRecoveryReady = 0;
         }
     }
     public void UseSpecial() {

@@ -21,7 +21,9 @@ public class EntityNPC : MonoBehaviour, IEntity {
     public float currentShield;
     public float status_frozen;
     public float status_frozenRecoveryRate;
-    public float status_burning;
+    public float status_burningStack;
+    public float status_burningTickDamage;
+    public float status_burningTicksRemaining;
     [Header("Defensive parameters")]
     public float stat_health;
     public float stat_shield;
@@ -52,7 +54,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
     private float lastShootAngle = 0;
 
     private const float DAMAGE_TO_VULNERABLE_STATUS_RATE = 0.0005f;  // 100DMG -> 5%
-    private const float DAMAGE_TO_BURNING_STATUS_RATE = 0.025f;
+    private const float DAMAGE_TO_BURNING_STATUS_RATE = 2;
     private const float DAMAGE_TO_FROZEN_STATUS_RATE = 0.1f;
     private const float SHOOT_SECUENCE_DELAY = 0.2f;
     private bool coRoutine_burning = false;
@@ -74,7 +76,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
         currentHealth = stat_health;
         currentShield = stat_shield;
         status_frozen = 0;
-        status_burning = 0;
+        status_burningStack = 0;
         status_frozenRecoveryRate = 0;
         stat_defense = 0;
     }
@@ -82,13 +84,15 @@ public class EntityNPC : MonoBehaviour, IEntity {
     IEnumerator FireDamageOverTime()
     {
         coRoutine_burning = true;
-
-        while (currentHealth > 0)
+        while (status_burningTicksRemaining > 0)
         {
-            if (status_burning < 1)
-                status_burning = 1;
-            IngameHudManager.currentInstance.DisplayDamageNotification(status_burning,false, Enums.DamageType.photon, transform.position);
-            SubstractHealthAndShield(status_burning, false);
+            if (status_burningTickDamage < 1)
+                status_burningTickDamage = 1;
+
+            status_burningTicksRemaining--;
+            status_burningStack -= status_burningTickDamage;
+            IngameHudManager.currentInstance.DisplayDamageNotification(status_burningTickDamage,false, Enums.DamageType.photon, transform.position);
+            SubstractHealthAndShield(status_burningTickDamage, false);
             yield return new WaitForSeconds(0.5f);
         }
         coRoutine_burning = false;
@@ -359,7 +363,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
         {
             case Enums.DamageType.electricEffect:
                 {
-                    ObjectPool.currentInstance.GetSparkFromPool().SetupSpark(transform.position, 4, amount, dmgDealer);
+                    ObjectPool.currentInstance.GetSparkFromPool().SetupSpark(transform.position, 5, amount, dmgDealer);
                     break;
                 }
             case Enums.DamageType.normal:
@@ -377,9 +381,13 @@ public class EntityNPC : MonoBehaviour, IEntity {
                 }
             case Enums.DamageType.photon:
                 {
+                    status_burningStack += amount * DAMAGE_TO_BURNING_STATUS_RATE;
+                    status_burningTickDamage = status_burningStack / 20;
+                    status_burningTicksRemaining = 20;
+
                     if (!coRoutine_burning)
                         StartCoroutine("FireDamageOverTime");
-                    status_burning += amount * DAMAGE_TO_BURNING_STATUS_RATE;
+
                     SubstractHealthAndShield(amount, false);
                     IngameHudManager.currentInstance.DisplayDamageNotification(amount, isCrit, Enums.DamageType.photon, transform.position);
                     break;
@@ -477,7 +485,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
         return isAlly;
     }
     public float GetEntityTimescale() {
-        return 1 - (status_frozen / 200f);
+        return  status_frozen < 100? 1 - (status_frozen / 200f) : 0;
     }
     public WeaponData.ProjectileTrajectory GetWeaponProjectileTrajectory() {
         return weapon_trajectory;

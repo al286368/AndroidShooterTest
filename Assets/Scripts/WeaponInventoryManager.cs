@@ -11,26 +11,9 @@ public class WeaponInventoryManager : MonoBehaviour {
     [Header("Texts")]
     public Text inventorySizeText;
     public Text pageNumberText;
-    [Header("CGs")]
+    [Header("Other")]
     public CanvasGroup inventoryElementsCG;
-    public CanvasGroup detailsParentCG;
-    [Header("Details Panel")]
-    public Text detailsWeaponName;
-    public Text detailsWeaponLevel;
-    public Text detailsWeaponDmg;
-    public Transform detailsBackgroundPhoton;
-    public Transform detailsBackgroundPulse;
-    public Transform detailsBackgroundElectric;
-    public Transform detailsBackgroundCryo;
-    public Transform detailsBackgroundNuclear;
-    public Transform detailsBackgroundPlasma;
-    public Transform detailsBackgroundGamma;
-    public Transform detailsDescElementNegative;
-    public Transform detailsDescTraits;
-    public Text details_basic;
-    public Text details_elementBonus;
-    public Text details_elementPenalty;
-    public Text details_traits;
+    public WeaponDetailsManager WDM;
 
     private bool swapPageAnimationInProgress = false;
     private bool detailsOpen = false;
@@ -69,80 +52,14 @@ public class WeaponInventoryManager : MonoBehaviour {
         }
 
     }
-    public void OpenDetailsPanel(WeaponData wd) {
-        detailsParentCG.gameObject.SetActive(true);
-        detailsOpen = true;
-
-        detailsBackgroundCryo.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.cryo);
-        detailsBackgroundPhoton.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.photon);
-        detailsBackgroundPulse.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.pulse);
-        detailsBackgroundElectric.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.electric);
-        detailsBackgroundNuclear.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.nuclear);
-        detailsBackgroundPlasma.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.plasma);
-        detailsBackgroundGamma.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.gamma);
-
-        detailsWeaponName.text = wd.GetWeaponName();
-        detailsWeaponLevel.text = wd.GetUpgradeLevel().ToString();
-        detailsWeaponDmg.text = wd.GetWeaponDamage().ToString() + "x" + wd.GetMultishoot().ToString();
-
-        switch (wd.GetWeaponElement()) {
-            case WeaponData.DamageElement.photon:
-                {
-                    details_elementBonus.text = "Leaves a stacking damage over time effect on enemies based on the damage done.";
-                    details_elementPenalty.text = "Deals reduced direct damage.";
-                    detailsDescElementNegative.gameObject.SetActive(true);
-                    break;
-                }
-            case WeaponData.DamageElement.electric:
-                {
-                    details_elementBonus.text = "Weapon impacts will bounce between enemies up to 4 times.";
-                    details_elementPenalty.text = "Deals reduced direct damage.";
-                    detailsDescElementNegative.gameObject.SetActive(true);
-                    break;
-                }
-            case WeaponData.DamageElement.cryo:
-                {
-                    details_elementBonus.text = "Slows down enemies based on the damage done, after reaching 50% slow, enemies will be stunnned and will take 100% increased damage for 5 seconds.";
-                    details_elementPenalty.text = "Deals reduced direct damage.";
-                    detailsDescElementNegative.gameObject.SetActive(true);
-                    break;
-                }
-            case WeaponData.DamageElement.gamma:
-                {
-                    details_elementBonus.text = "30% Chance to release a gamma ray burst on impact, dealing 300% of the bullet damage.";
-                    details_elementPenalty.text = "Can not critically hit.";
-                    detailsDescElementNegative.gameObject.SetActive(true);
-                    break;
-                }
-            case WeaponData.DamageElement.nuclear:
-                {
-                    details_elementBonus.text = "Projectiles will explode on impact doing area damage.";
-                    details_elementPenalty.text = "Can not critically hit.";
-                    detailsDescElementNegative.gameObject.SetActive(true);
-                    break;
-                }
-            case WeaponData.DamageElement.plasma:
-                {
-                    details_elementBonus.text = "Lowers enemy deffense, increasing their damage taken, based on damage done.";
-                    details_elementPenalty.text = "Deals reduced direct damage.";
-                    detailsDescElementNegative.gameObject.SetActive(true);
-                    break;
-                }
-            default:
-                {
-                    details_elementBonus.text = "This weapon has no elemental effects, but it has balanced stats.";
-                    detailsDescElementNegative.gameObject.SetActive(false);
-                    break;
-                }
-        }
-        details_basic.text = "Firerate: " + wd.GetFirerate().ToString("F1") + "shoots per second";
-        if (wd.GetWeaponElement() != WeaponData.DamageElement.nuclear && wd.GetWeaponElement() != WeaponData.DamageElement.gamma)
+    public void OnPreviousPageButtonClicked()
+    {
+        if (swapPageAnimationInProgress)
+            return;
+        if (page > 0)
         {
-            details_basic.text += "\nCritical chance: " + wd.GetCritChance().ToString("F0") + "%";
-            details_basic.text += "\nCritical damage: x" + wd.GetCritMultiplier().ToString("F1");
+            StartCoroutine("PreviousPageAnimation");
         }
-        detailsDescTraits.gameObject.SetActive(false);
-
     }
     public void OnSortButtonClicked() {
         if (swapPageAnimationInProgress)
@@ -162,22 +79,10 @@ public class WeaponInventoryManager : MonoBehaviour {
         MainMenuManager.currentInstance.OnExitInventoryClick();
     }
     public void SendClickFromInventoryElement(WeaponData WD, int index) {
-        OpenDetailsPanel(WD);
-        GlobalGameManager.currentInstance.GetGameData().SetNewPlayerSelectedWeapon(WD);
+        WDM.OpenDetailsPanel(WD);
         UpdateAllElements();
     }
-    public void OnPreviousPageButtonClicked() {
-        if (swapPageAnimationInProgress)
-            return;
-        if (page > 0) {
-            StartCoroutine("PreviousPageAnimation");
-        }
-    }
-    public void OnCloseDetailsClicked()
-    {
-        detailsOpen = false;
-        detailsParentCG.gameObject.SetActive(false);
-    }
+
     IEnumerator NextPageAnimation() {
         swapPageAnimationInProgress = true;
         float t = 0;

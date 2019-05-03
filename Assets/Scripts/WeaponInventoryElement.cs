@@ -21,12 +21,8 @@ public class WeaponInventoryElement : MonoBehaviour {
     public Image nuclearBackground;
     public Image plasmaBackground;
     public Image gammaBackground;
-    [Header("RarityColors")]
-    public Image commonBorder;
-    public Image rareBorder;
-    public Image exoticBorder;
-    public Image hiTechBorder;
-    public Image prototypeBorder;
+    [Header("Other")]
+    public Image qualityBorder;
 
     public void SetFor(WeaponData WD) {
         if (WD == null) {
@@ -55,11 +51,34 @@ public class WeaponInventoryElement : MonoBehaviour {
         gammaBackground.gameObject.SetActive(wd_stored.GetWeaponElement() == WeaponData.DamageElement.gamma);
     }
     public void SetRarityBorder() {
-        commonBorder.gameObject.SetActive(wd_stored.GetWeaponRarity() == WeaponData.Rarity.common);
-        rareBorder.gameObject.SetActive(wd_stored.GetWeaponRarity() == WeaponData.Rarity.rare);
-        exoticBorder.gameObject.SetActive(wd_stored.GetWeaponRarity() == WeaponData.Rarity.exotic);
-        hiTechBorder.gameObject.SetActive(wd_stored.GetWeaponRarity() == WeaponData.Rarity.hiTech);
-        prototypeBorder.gameObject.SetActive(wd_stored.GetWeaponRarity() == WeaponData.Rarity.prototype);
+        switch (wd_stored.GetWeaponRarity())
+        {
+            case WeaponData.Rarity.rare:
+                {
+                    qualityBorder.color = GlobalGameManager.currentInstance.GetQualityColorRare();
+                    break;
+                }
+            case WeaponData.Rarity.exotic:
+                {
+                    qualityBorder.color = GlobalGameManager.currentInstance.GetQualityColorExotic();
+                    break;
+                }
+            case WeaponData.Rarity.hiTech:
+                {
+                    qualityBorder.color = GlobalGameManager.currentInstance.GetQualityColorHiTech();
+                    break;
+                }
+            case WeaponData.Rarity.prototype:
+                {
+                    qualityBorder.color = GlobalGameManager.currentInstance.GetQualityColorPrototype();
+                    break;
+                }
+            default:
+                {
+                    qualityBorder.color = GlobalGameManager.currentInstance.GetQualityColorCommon();
+                    break;
+                }
+        }
     }
     public void OnElementClicked() {
         WeaponInventoryManager.currentInstance.SendClickFromInventoryElement(wd_stored, index);

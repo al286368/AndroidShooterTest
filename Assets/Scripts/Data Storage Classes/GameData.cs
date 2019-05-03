@@ -18,7 +18,7 @@ public class GameData {
     public GameData() {
         data_weaponInventory = new List<WeaponData>();
         playerSelectedShip = new ShipData();
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 35; i++)
         {
             AddWeaponToInventory(new WeaponData(2.25f));
         }
@@ -29,6 +29,9 @@ public class GameData {
         settings_soundEnabled = true;
         settings_musicEnabled = true;
         settings_particlesEnabled = true;
+    }
+    public List<WeaponData> GetWeaponList() {
+        return data_weaponInventory;
     }
     public void SetNewPlayerSelectedWeapon(WeaponData newWd) {
         playerSelectedWeapon = newWd;
@@ -74,7 +77,7 @@ public class GameData {
         return data_weaponInventory.Count;
     }
     public WeaponData GetWeaponInInventorySlot(int index) {
-        if (index >= data_weaponInventory.Count)
+        if (index >= data_weaponInventory.Count || index < 0)
         {
             return null;
         }

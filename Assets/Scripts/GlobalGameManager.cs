@@ -7,6 +7,11 @@ public class GlobalGameManager : MonoBehaviour {
     private GameData GD;
 
     public static GlobalGameManager currentInstance;
+    public Color qualityColorCommon;
+    public Color qualityColorRare;
+    public Color qualityColorExotic;
+    public Color qualityColorHiTech;
+    public Color qualityColorPrototype;
 
     private void Awake()
     {
@@ -28,5 +33,24 @@ public class GlobalGameManager : MonoBehaviour {
     }
     public GameData GetGameData() {
         return GD;
+    }
+    public Color GetQualityColorCommon() {
+        return qualityColorCommon;
+    }
+    public Color GetQualityColorRare()
+    {
+        return qualityColorRare;
+    }
+    public Color GetQualityColorExotic()
+    {
+        return qualityColorExotic;
+    }
+    public Color GetQualityColorHiTech()
+    {
+        return qualityColorHiTech;
+    }
+    public Color GetQualityColorPrototype()
+    {
+        return qualityColorPrototype;
     }
 }

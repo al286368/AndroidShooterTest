@@ -49,7 +49,7 @@ public class StageManager : MonoBehaviour {
                 return null;
 
             IEntity targetFound = null;
-            float minDistance = 99999;
+            float minDistance = 5f;
             float tmpDist = 0;
             for (int i = 0; i < enemiesInStage.Count; i++) {
                 tmpDist = Vector3.Distance(pos, enemiesInStage[i].transform.position);
