@@ -77,6 +77,11 @@ public class NotificationBehaviour : MonoBehaviour {
                     notificationText.color = new Color(1, 0, 0.5f);
                     break;
                 }
+            case Enums.DamageType.gamma:
+                {
+                    notificationText.color = Color.green;
+                    break;
+                }
         }
     }
 	// Update is called once per frame

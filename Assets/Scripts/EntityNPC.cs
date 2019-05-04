@@ -35,6 +35,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
     public float stat_damage_electric;
     public float stat_damage_nuclear;
     public float stat_damage_plasma;
+    public float stat_damage_gamma;
     public float stat_effectiveness;
     public float stat_critChance;
     public float stat_critMultiplier;
@@ -423,6 +424,12 @@ public class EntityNPC : MonoBehaviour, IEntity {
                     SubstractHealthAndShield(amount, false);
                     break;
                 }
+            case Enums.DamageType.gamma:
+                {
+                    IngameHudManager.currentInstance.DisplayDamageNotification(amount, isCrit, Enums.DamageType.gamma, transform.position);
+                    SubstractHealthAndShield(amount, false);
+                    break;
+                }
         }
     }
     private void SubstractHealthAndShield(float dmg, bool ignoreShield)
@@ -464,6 +471,9 @@ public class EntityNPC : MonoBehaviour, IEntity {
     }
     public float GetPlasmaDamage() {
         return stat_damage_plasma;
+    }
+    public float GetGammaDamage() {
+        return stat_damage_gamma;
     }
     public int GetBulletBounces() {
         return stat_bounces;

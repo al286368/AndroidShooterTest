@@ -15,6 +15,7 @@ public class BulletBehaviour : MonoBehaviour {
     private float damage_electric = 0;
     private float damage_nuclear = 0;
     private float damage_plasma = 0;
+    private float damage_gamma = 0;
     private float property_speedScale = 1;
     private float property_bounces = 10;
 
@@ -68,6 +69,7 @@ public class BulletBehaviour : MonoBehaviour {
         damage_electric = e_user.GetElectricDamage();
         damage_nuclear = e_user.GetNuclearDamage();
         damage_plasma = e_user.GetPlasmaDamage();
+        damage_gamma = e_user.GetGammaDamage();
         property_speedScale = e_user.GetBulletSpeedScale();
 
         property_bounces = e_user.GetBulletBounces();
@@ -117,6 +119,12 @@ public class BulletBehaviour : MonoBehaviour {
                 {
                     BVMInUse = visualParents[5];
                     visualParents[5].gameObject.SetActive(true);
+                    break;
+                }
+            case WeaponData.DamageElement.gamma:
+                {
+                    BVMInUse = visualParents[6];
+                    visualParents[6].gameObject.SetActive(true);
                     break;
                 }
         }
@@ -277,16 +285,21 @@ public class BulletBehaviour : MonoBehaviour {
     }
     private void HitEnemyEntity(IEntity e)
     {
+        if (damage_nuclear > 0)
+        {
+            ObjectPool.currentInstance.GetExplosionFromPool().SetupExplosion(damage_nuclear, 1, Enums.DamageType.nuclearDamage, transform.position, entity_user);
+        }
+        if (damage_gamma > 0)
+        {
+            ObjectPool.currentInstance.GetGammaBeamFromPool().SetAs(damage_gamma, entity_user, transform.position, directionLocal + directionParent);
+        }
         EntityCollision();
         e.DealDamage(damage_phys, Enums.DamageType.normal, entity_user);
         e.DealDamage(damage_photon, Enums.DamageType.photon, entity_user);
         e.DealDamage(damage_electric, Enums.DamageType.electricEffect, entity_user);
         e.DealDamage(damage_cryo, Enums.DamageType.cryo, entity_user);
         e.DealDamage(damage_plasma, Enums.DamageType.plasma, entity_user);
-        if (damage_nuclear > 0)
-        {
-            ObjectPool.currentInstance.GetExplosionFromPool().SetupExplosion(damage_nuclear, 1, Enums.DamageType.nuclearDamage, transform.position, entity_user);
-        }
+
     }
     public void SetAngle(float local, float parent) {
         directionLocal = local;

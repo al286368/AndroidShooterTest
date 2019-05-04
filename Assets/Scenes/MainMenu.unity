@@ -22604,6 +22604,7 @@ MonoBehaviour:
   detailsHeat: {fileID: 442031353}
   details_elementBonus: {fileID: 1976314567}
   details_elementPenalty: {fileID: 1443853395}
+  detailsTrait: {fileID: 1699360987}
   detailsDescElementPositive: {fileID: 1976314564}
   detailsDescElementNegative: {fileID: 1443853392}
   detailsDescTraits: {fileID: 1699360984}

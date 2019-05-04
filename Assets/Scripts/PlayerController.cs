@@ -30,8 +30,8 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
-        ControlsComputer();
-        //ControlsPhone();
+        //ControlsComputer();
+        ControlsPhone();
         CheckBounds();
     }
     public void FireButtonUp()

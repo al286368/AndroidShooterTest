@@ -55,11 +55,11 @@ public class WeaponData {
 
     public static float ELEM_PULSE_DMGMULT = 1f;
     public static float ELEM_PHOTON_DMGMULT = 0.4f;
-    public static float ELEM_NUCLEAR_DMGMULT = 0.75f;
-    public static float ELEM_CRYO_DMGMULT = 0.5f;
-    public static float ELEM_ELECTRIC_DMGMULT = 0.2f;
-    public static float ELEM_PLASMA_DMGMULT = 0.65f;
-    public static float ELEM_GAMMA_DMGMULT = 1.25f;
+    public static float ELEM_NUCLEAR_DMGMULT = 1.15f;
+    public static float ELEM_CRYO_DMGMULT = 0.85f;
+    public static float ELEM_ELECTRIC_DMGMULT = 0.3f;
+    public static float ELEM_PLASMA_DMGMULT = 0.6f;
+    public static float ELEM_GAMMA_DMGMULT = 0.65f;
 
 
 
@@ -85,7 +85,7 @@ public class WeaponData {
     }
     #region Generation Functions
     public void SetRandomAvailableElement() {
-        int variation = Random.Range(1, 7);
+        int variation = Random.Range(1, 8);
         switch (variation)
         {
             case 2:
@@ -225,20 +225,18 @@ public class WeaponData {
                 }
             case ShootSecuence.barrage_crossful:
                 {
-                    variation = Random.Range(1, 5);
+                    variation = Random.Range(1, 4);
                     if (variation == 1) { weapon_projectile_trajectory = ProjectileTrajectory.normal; }
                     else if (variation == 2) { weapon_projectile_trajectory = ProjectileTrajectory.tracking; }
-                    else if (variation == 3) { weapon_projectile_trajectory = ProjectileTrajectory.helix; }
                     else { weapon_projectile_trajectory = ProjectileTrajectory.binarytrack; }
                     weapon_multishoot = Random.Range(5, 9);
                     break;
                 }
             case ShootSecuence.barrage_crosshalf:
                 {
-                    variation = Random.Range(1, 5);
+                    variation = Random.Range(1, 4);
                     if (variation == 1) { weapon_projectile_trajectory = ProjectileTrajectory.normal; }
                     else if (variation == 2) { weapon_projectile_trajectory = ProjectileTrajectory.tracking; }
-                    else if (variation == 3) { weapon_projectile_trajectory = ProjectileTrajectory.helix; }
                     else { weapon_projectile_trajectory = ProjectileTrajectory.binarytrack; }
                     weapon_multishoot = Random.Range(5, 9);
                     break;
@@ -332,7 +330,7 @@ public class WeaponData {
             case DamageElement.gamma:
                 {
                     weapon_heat_per_projectile = 1.5f * WEAPON_BASE_HEAT_PER_SHOOT;
-                    weapon_critChance = 0;
+                    weapon_critChance = Random.Range(5, 20);
                     break;
                 }
             case DamageElement.plasma:
@@ -373,7 +371,7 @@ public class WeaponData {
                 }
         }
         if (CanCrit())
-            weapon_critMultiplier = 1 + (20 / weapon_critChance);
+            weapon_critMultiplier = 1 + (25 / weapon_critChance);
         else
             weapon_critMultiplier = 1;
     }
@@ -423,7 +421,7 @@ public class WeaponData {
         return weapon_element;
     }
     public bool CanCrit() {
-        return weapon_element != DamageElement.nuclear && weapon_element != DamageElement.gamma;
+        return weapon_element != DamageElement.nuclear;
     }
 	public string GetWeaponName() {
 		return weapon_name;
@@ -492,6 +490,13 @@ public class WeaponData {
     {
         if (weapon_element == DamageElement.plasma)
             return (WEAPON_BASE_DAMAGE + weapon_upgLevel * WEAPON_BASE_SCALING_PER_LEVEL) * ELEM_PLASMA_DMGMULT;
+        else
+            return 0;
+    }
+    public float GetGammaDamage()
+    {
+        if (weapon_element == DamageElement.gamma)
+            return (WEAPON_BASE_DAMAGE + weapon_upgLevel * WEAPON_BASE_SCALING_PER_LEVEL) * ELEM_GAMMA_DMGMULT;
         else
             return 0;
     }

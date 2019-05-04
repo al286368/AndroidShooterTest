@@ -31,6 +31,7 @@ public class WeaponDetailsManager : MonoBehaviour {
     public Text detailsHeat;
     public Text details_elementBonus;
     public Text details_elementPenalty;
+    public Text detailsTrait;
     public Transform detailsDescElementPositive;
     public Transform detailsDescElementNegative;
     public Transform detailsDescTraits;
@@ -50,7 +51,9 @@ public class WeaponDetailsManager : MonoBehaviour {
 
         detailsDescElementPositive.gameObject.SetActive(false);
         detailsDescElementNegative.gameObject.SetActive(false);
-        detailsDescTraits.gameObject.SetActive(false);
+        detailsDescTraits.gameObject.SetActive(true); //TEMP
+        detailsTrait.text = wd.GetWeaponProjectileTrajectory().ToString();
+        
 
         wdOnDisplay = wd;
 
@@ -124,8 +127,8 @@ public class WeaponDetailsManager : MonoBehaviour {
             case WeaponData.DamageElement.gamma:
                 {
                     detailsDescElementPositive.gameObject.SetActive(true);
-                    details_elementBonus.text = "30% Chance to release a gamma ray burst on impact, dealing 300% of the bullet damage.";
-                    details_elementPenalty.text = "Can not critically hit.";
+                    details_elementBonus.text = "Projectiles release a gamma burst after impact";
+                    details_elementPenalty.text = "Heats up extremely fast.";
                     detailsDescElementNegative.gameObject.SetActive(true);
                     break;
                 }
@@ -154,7 +157,7 @@ public class WeaponDetailsManager : MonoBehaviour {
                 }
         }
         detailsFirerate.text = wd.GetFirerate().ToString("F1") + "/sec";
-        if (wd.GetWeaponElement() != WeaponData.DamageElement.nuclear && wd.GetWeaponElement() != WeaponData.DamageElement.gamma)
+        if (wd.GetWeaponElement() != WeaponData.DamageElement.nuclear)
         {
             detailsCritC.text = wd.GetCritChance().ToString("F0") + "%";
             detailsCritX.text = "X " + wd.GetCritMultiplier().ToString("F1");
