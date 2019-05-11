@@ -103,7 +103,7 @@ public class WeaponDetailsManager : MonoBehaviour {
             case WeaponData.DamageElement.photon:
                 {
                     detailsDescElementPositive.gameObject.SetActive(true);
-                    details_elementBonus.text = "Deals " + ((wd.GetWeaponDamage()*2f).ToString()) + " extra damage over 10 seconds. Multiple instances of this effect can be stacked.";
+                    details_elementBonus.text = "Deals " + ((wd.GetWeaponDamage()*2f).ToString()) + " extra damage over 10 seconds. Multiple instances of this effect can be stacked. \nBullets will pierce through enemies once.";
                     details_elementPenalty.text = "Deals reduced direct damage.";
                     detailsDescElementNegative.gameObject.SetActive(true);
                     break;
@@ -119,7 +119,7 @@ public class WeaponDetailsManager : MonoBehaviour {
             case WeaponData.DamageElement.cryo:
                 {
                     detailsDescElementPositive.gameObject.SetActive(true);
-                    details_elementBonus.text = "Each bullet slows down enemies by " + (wd.GetWeaponDamage()*0.1f).ToString("F1") + "%, after reaching 50% slow, enemies will be stunnned and will take 100% increased damage for 5 seconds.";
+                    details_elementBonus.text = "Each bullet slows down enemies by " + (wd.GetWeaponDamage()*0.1f).ToString("F1") + "%, after reaching 50% slow, enemies will be stunnned and will take 100% increased damage for 5 seconds. \nBullets will bounce off walls and enemies once.";
                     details_elementPenalty.text = "Deals reduced direct damage.";
                     detailsDescElementNegative.gameObject.SetActive(true);
                     break;

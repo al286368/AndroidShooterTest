@@ -41,6 +41,7 @@ public class EntityNPC : MonoBehaviour, IEntity {
     public float stat_critMultiplier;
     public float stat_bulletSpeed;
     public int stat_bounces;
+    public int stat_piercing;
     public int weapon_multishoot;
     public float weapon_multishootArc;
     public float weapon_randomSpread;
@@ -475,8 +476,11 @@ public class EntityNPC : MonoBehaviour, IEntity {
     public float GetGammaDamage() {
         return stat_damage_gamma;
     }
-    public int GetBulletBounces() {
+    public int GetBulletBounces(){
         return stat_bounces;
+    }
+    public int GetBulletPiercing(){
+        return stat_piercing;
     }
     void DisableEntity() {
         StopAllCoroutines();

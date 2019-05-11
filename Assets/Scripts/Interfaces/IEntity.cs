@@ -23,6 +23,7 @@ public interface IEntity {
     float GetCritMultiplier();
 
     int GetBulletBounces();
+    int GetBulletPiercing();
 
     bool IsAlly();
     bool IsAlive();

@@ -17,7 +17,8 @@ public class BulletBehaviour : MonoBehaviour {
     private float damage_plasma = 0;
     private float damage_gamma = 0;
     private float property_speedScale = 1;
-    private float property_bounces = 10;
+    private int property_bounces = 0;
+    private int property_piercing = 0;
 
     private float tmp_bounceCooldown = 0;
     private float tmp_backToPoolDelay = 0;
@@ -73,6 +74,7 @@ public class BulletBehaviour : MonoBehaviour {
         property_speedScale = e_user.GetBulletSpeedScale();
 
         property_bounces = e_user.GetBulletBounces();
+        property_piercing = e_user.GetBulletPiercing();
 
     }
     void SetupVisuals()
@@ -293,7 +295,14 @@ public class BulletBehaviour : MonoBehaviour {
         {
             ObjectPool.currentInstance.GetGammaBeamFromPool().SetAs(damage_gamma, entity_user, transform.position, directionLocal + directionParent);
         }
-        EntityCollision();
+        if (property_piercing > 0)
+        {
+            property_piercing--;
+        }
+        else
+        {
+            EntityCollision();
+        }
         e.DealDamage(damage_phys, Enums.DamageType.normal, entity_user);
         e.DealDamage(damage_photon, Enums.DamageType.photon, entity_user);
         e.DealDamage(damage_electric, Enums.DamageType.electricEffect, entity_user);

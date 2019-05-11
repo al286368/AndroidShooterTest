@@ -299,7 +299,7 @@ public class PlayerEntity : MonoBehaviour, IEntity {
         BeamBehaviour beam;
         beam = ObjectPool.currentInstance.GetBeamFromPool();
         if (GetWeaponRandomSpread() > 0) beam.SetBeam(this, transform.position, GetBulletBounces(), degree + Random.Range(-GetWeaponRandomSpread(), GetWeaponRandomSpread()), entityHitbox);
-        else beam.SetBeam(this, transform.position, GetWeaponBounces(), degree, entityHitbox);
+        else beam.SetBeam(this, transform.position, GetBulletBounces(), degree, entityHitbox);
     }
     #endregion
     #region Interface implementation and Getters
@@ -368,7 +368,10 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     {
         return playerWeaponData.GetBounces();
     }
-
+    public int GetBulletPiercing()
+    {
+        return playerWeaponData.GetPiercing();
+    }
     public float GetCryoDamage()
     {
         return playerWeaponData.GetCryoDamage();
@@ -418,10 +421,6 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     public float GetWeaponRandomSpread()
     {
         return playerWeaponData.GetRandomSpread();
-    }
-    public int GetWeaponBounces()
-    {
-        return playerWeaponData.GetBounces();
     }
     public float GetBulletSpeedScale() {
         return playerWeaponData.GetProjectileSpeed();

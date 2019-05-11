@@ -42,6 +42,7 @@ public class WeaponData {
     private float weapon_heat_per_projectile;
 	private int weapon_multishoot;
 	private int weapon_bounces;
+    private int weapon_piercing;
 	private ShootSecuence weapon_shootSecuence;
 	private AttackType weapon_attackType;
     private DamageElement weapon_element;
@@ -91,36 +92,50 @@ public class WeaponData {
             case 2:
                 {
                     weapon_element = DamageElement.photon;
+                    weapon_piercing = 1;
+                    weapon_bounces = 0;
                     break;
                 }
             case 3:
                 {
                     weapon_element = DamageElement.nuclear;
+                    weapon_piercing = 0;
+                    weapon_bounces = 0;
                     break;
                 }
             case 4:
                 {
                     weapon_element = DamageElement.cryo;
+                    weapon_piercing = 0;
+                    weapon_bounces = 1;
                     break;
                 }
             case 5:
                 {
                     weapon_element = DamageElement.electric;
+                    weapon_piercing = 0;
+                    weapon_bounces = 0;
                     break;
                 }
             case 6:
                 {
                     weapon_element = DamageElement.plasma;
+                    weapon_piercing = 0;
+                    weapon_bounces = 0;
                     break;
                 }
             case 7:
                 {
                     weapon_element = DamageElement.gamma;
+                    weapon_piercing = 0;
+                    weapon_bounces = 0;
                     break;
                 }
             default:
                 {
                     weapon_element = DamageElement.pulse;
+                    weapon_piercing = 0;
+                    weapon_bounces = 0;
                     break;
                 }
         }
@@ -453,6 +468,9 @@ public class WeaponData {
 	public int GetBounces() { 
 		return weapon_bounces;
 	}
+    public int GetPiercing(){
+        return weapon_piercing;
+    }
     public float GetHeatPerProjectile() {
         return weapon_heat_per_projectile;
     }
