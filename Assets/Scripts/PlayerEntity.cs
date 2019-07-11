@@ -407,6 +407,9 @@ public class PlayerEntity : MonoBehaviour, IEntity {
     public float GetGammaDamage() {
         return playerWeaponData.GetGammaDamage();
     }
+    public float GetGravitonDamage() {
+        return playerWeaponData.GetGravitonDamage();
+    }
     public int GetMultishoot()
     {
         return playerWeaponData.GetMultishoot();

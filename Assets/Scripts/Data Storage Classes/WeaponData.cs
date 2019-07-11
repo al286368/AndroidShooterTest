@@ -14,11 +14,11 @@ public class WeaponData {
 	}
     public enum ProjectileTrajectory
     {
-        normal, deflected, helix, tracking, binarytrack, delayedTracking, wave
+        normal, deflected, helix, tracking, binarytrack, wave, convergence
     }
     public enum DamageElement
 	{
-		pulse, photon, nuclear, cryo, electric, plasma, gamma
+		pulse, photon, nuclear, cryo, electric, plasma, gamma, graviton
 	}
 	public enum AttackType
 	{
@@ -27,6 +27,10 @@ public class WeaponData {
     public enum Rarity
     {
         common, rare, exotic, hiTech, prototype
+    }
+    public enum Trait
+    {
+        energyOnKill, shieldOnKill, enthropicBlast, zeroPointBlast, hyperVoltage,
     }
 
 	private string weapon_name;
@@ -48,6 +52,7 @@ public class WeaponData {
     private DamageElement weapon_element;
     private ProjectileTrajectory weapon_projectile_trajectory;
     private Rarity weapon_rarity;
+    private List<Trait> weapon_traits;
 
 	public static float WEAPON_BASE_DAMAGE = 100;
     public static float WEAPON_BASE_HEAT_PER_SHOOT = 1.8f;
@@ -61,6 +66,7 @@ public class WeaponData {
     public static float ELEM_ELECTRIC_DMGMULT = 0.3f;
     public static float ELEM_PLASMA_DMGMULT = 0.6f;
     public static float ELEM_GAMMA_DMGMULT = 0.65f;
+    public static float ELEM_GRAV_DMGMULT = 0.8f;
 
 
 
@@ -83,10 +89,11 @@ public class WeaponData {
         SetRandomTrajectoryAndMultishoot();
         SetDamage();
         SetDpsStats();
+        SetTraits();
     }
     #region Generation Functions
     public void SetRandomAvailableElement() {
-        int variation = Random.Range(1, 8);
+        int variation = Random.Range(1, 9);
         switch (variation)
         {
             case 2:
@@ -127,6 +134,13 @@ public class WeaponData {
             case 7:
                 {
                     weapon_element = DamageElement.gamma;
+                    weapon_piercing = 0;
+                    weapon_bounces = 0;
+                    break;
+                }
+            case 8:
+                {
+                    weapon_element = DamageElement.graviton;
                     weapon_piercing = 0;
                     weapon_bounces = 0;
                     break;
@@ -348,6 +362,12 @@ public class WeaponData {
                     weapon_critChance = Random.Range(5, 20);
                     break;
                 }
+            case DamageElement.graviton:
+                {
+                    weapon_heat_per_projectile = 1.05f * WEAPON_BASE_HEAT_PER_SHOOT;
+                    weapon_critChance = Random.Range(20, 31);
+                    break;
+                }
             case DamageElement.plasma:
                 {
                     weapon_heat_per_projectile = 1.45f * WEAPON_BASE_HEAT_PER_SHOOT;
@@ -390,9 +410,34 @@ public class WeaponData {
         else
             weapon_critMultiplier = 1;
     }
+    public void SetTraits() {
+        weapon_traits = new List<Trait>();
+        if (weapon_rarity == Rarity.prototype) {
+            weapon_traits.Add(GetRandomCompatibleTrait());
+        }
+    }
+    public Trait GetRandomCompatibleTrait() {
+        List<Trait> traitPool = new List<Trait>();
+
+        traitPool.Add(Trait.energyOnKill);
+        traitPool.Add(Trait.shieldOnKill);
+        if (weapon_element == DamageElement.electric) {
+            traitPool.Add(Trait.hyperVoltage);
+        }
+        if (weapon_element == DamageElement.cryo) {
+            traitPool.Add(Trait.zeroPointBlast);
+        }
+        return traitPool[Random.Range(0, traitPool.Count)];
+
+    }
     public void SetDamage() {
         switch (weapon_element)
         {
+            case DamageElement.graviton:
+                {
+                    weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_GRAV_DMGMULT);
+                    break;
+                }
             case DamageElement.gamma:
                 {
                     weapon_damage = (int)((WEAPON_BASE_DAMAGE + WEAPON_BASE_SCALING_PER_LEVEL * weapon_upgLevel) * ELEM_GAMMA_DMGMULT);
@@ -515,6 +560,12 @@ public class WeaponData {
     {
         if (weapon_element == DamageElement.gamma)
             return (WEAPON_BASE_DAMAGE + weapon_upgLevel * WEAPON_BASE_SCALING_PER_LEVEL) * ELEM_GAMMA_DMGMULT;
+        else
+            return 0;
+    }
+    public float GetGravitonDamage() {
+        if (weapon_element == DamageElement.graviton)
+            return (WEAPON_BASE_DAMAGE + weapon_upgLevel * WEAPON_BASE_SCALING_PER_LEVEL) * ELEM_GRAV_DMGMULT;
         else
             return 0;
     }

@@ -20,6 +20,7 @@ public class WeaponDetailsManager : MonoBehaviour {
     public Image detailsBackgroundNuclear;
     public Image detailsBackgroundPlasma;
     public Image detailsBackgroundGamma;
+    public Image detailsBackgroundGraviton;
     public Image detailsQualityBorder1;
     public Image detailsQualityBorder2;
     public Text detailsWeaponName;
@@ -64,6 +65,7 @@ public class WeaponDetailsManager : MonoBehaviour {
         detailsBackgroundNuclear.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.nuclear);
         detailsBackgroundPlasma.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.plasma);
         detailsBackgroundGamma.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.gamma);
+        detailsBackgroundGraviton.gameObject.SetActive(wd.GetWeaponElement() == WeaponData.DamageElement.graviton);
 
         detailsWeaponName.text = wd.GetWeaponName();
         detailsWeaponLevel.text = wd.GetUpgradeLevel().ToString();
@@ -148,10 +150,18 @@ public class WeaponDetailsManager : MonoBehaviour {
                     detailsDescElementNegative.gameObject.SetActive(true);
                     break;
                 }
+            case WeaponData.DamageElement.graviton:
+                {
+                    detailsDescElementPositive.gameObject.SetActive(true);
+                    details_elementBonus.text = "Projectiles implode dealing area damage, damage of each implosion is increased by 25% after subsecuent hits.";
+                    details_elementPenalty.text = "Projectiles will deal damage AFTER a short delay.\nDeals reduced direct damage.";
+                    detailsDescElementNegative.gameObject.SetActive(true);
+                    break;
+                }
             default:
                 {
                     detailsDescElementPositive.gameObject.SetActive(true);
-                    details_elementBonus.text = "This weapon has no elemental effects, but it has balanced stats.";
+                    details_elementBonus.text = "This weapon has no elemental effects, but it has balanced stats and reduced heat.";
                     detailsDescElementNegative.gameObject.SetActive(false);
                     break;
                 }

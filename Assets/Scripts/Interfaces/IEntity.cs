@@ -16,6 +16,8 @@ public interface IEntity {
     float GetCryoDamage();
     float GetPlasmaDamage();
     float GetGammaDamage();
+    float GetGravitonDamage();
+
     float GetBulletSpeedScale();
     float GetHealthPercent();
     float GetEntityTimescale();

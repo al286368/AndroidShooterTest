@@ -10,6 +10,7 @@ public class ObjectPool : MonoBehaviour {
     public GameObject prefab_explosions;
     public GameObject prefab_sparks;
     public GameObject prefab_gamma;
+    public GameObject prefab_graviton;
     [Header("Object Group Parent")]
     public Transform parent_attacks;
     public Transform parent_beams;
@@ -19,6 +20,7 @@ public class ObjectPool : MonoBehaviour {
     private List<BeamBehaviour> pool_beams;
     private List<ExplosionBehaviour> pool_explosions;
     private List<GammaBeamBehaviour> pool_gamma;
+    private List<ImplosionBehaviour> pool_graviton;
 
     private const int BASE_POOL_SIZE = 10;
 
@@ -69,6 +71,13 @@ public class ObjectPool : MonoBehaviour {
             lastInstantiatedObject = Instantiate(prefab_gamma, parent_attacks) as GameObject;
             lastInstantiatedObject.gameObject.SetActive(false);
             pool_gamma.Add(lastInstantiatedObject.GetComponent<GammaBeamBehaviour>());
+        }
+        pool_graviton = new List<ImplosionBehaviour>();
+        for (int i = 0; i < BASE_POOL_SIZE; i++)
+        {
+            lastInstantiatedObject = Instantiate(prefab_graviton, parent_attacks) as GameObject;
+            lastInstantiatedObject.gameObject.SetActive(false);
+            pool_graviton.Add(lastInstantiatedObject.GetComponent<ImplosionBehaviour>());
         }
 
     }
@@ -144,6 +153,20 @@ public class ObjectPool : MonoBehaviour {
         lastInstantiatedObject.gameObject.SetActive(false);
         pool_gamma.Add(lastInstantiatedObject.GetComponent<GammaBeamBehaviour>());
         return lastInstantiatedObject.GetComponent<GammaBeamBehaviour>();
+    }
+    public ImplosionBehaviour GetGravitonFromPool()
+    {
+        for (int i = 0; i < pool_graviton.Count; i++)
+        {
+            if (!pool_graviton[i].gameObject.activeInHierarchy)
+            {
+                return pool_graviton[i];
+            }
+        }
+        GameObject lastInstantiatedObject = Instantiate(prefab_graviton, parent_attacks) as GameObject;
+        lastInstantiatedObject.gameObject.SetActive(false);
+        pool_graviton.Add(lastInstantiatedObject.GetComponent<ImplosionBehaviour>());
+        return lastInstantiatedObject.GetComponent<ImplosionBehaviour>();
     }
     #endregion
 }

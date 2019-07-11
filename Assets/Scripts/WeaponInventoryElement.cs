@@ -21,6 +21,7 @@ public class WeaponInventoryElement : MonoBehaviour {
     public Image nuclearBackground;
     public Image plasmaBackground;
     public Image gammaBackground;
+    public Image gravitonBackground;
     [Header("Other")]
     public Image qualityBorder;
 
@@ -49,6 +50,7 @@ public class WeaponInventoryElement : MonoBehaviour {
         nuclearBackground.gameObject.SetActive(wd_stored.GetWeaponElement() == WeaponData.DamageElement.nuclear);
         plasmaBackground.gameObject.SetActive(wd_stored.GetWeaponElement() == WeaponData.DamageElement.plasma);
         gammaBackground.gameObject.SetActive(wd_stored.GetWeaponElement() == WeaponData.DamageElement.gamma);
+        gravitonBackground.gameObject.SetActive(wd_stored.GetWeaponElement() == WeaponData.DamageElement.graviton);
     }
     public void SetRarityBorder() {
         switch (wd_stored.GetWeaponRarity())

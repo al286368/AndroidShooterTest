@@ -16,6 +16,7 @@ public class BulletBehaviour : MonoBehaviour {
     private float damage_nuclear = 0;
     private float damage_plasma = 0;
     private float damage_gamma = 0;
+    private float damage_graviton = 0;
     private float property_speedScale = 1;
     private int property_bounces = 0;
     private int property_piercing = 0;
@@ -71,6 +72,7 @@ public class BulletBehaviour : MonoBehaviour {
         damage_nuclear = e_user.GetNuclearDamage();
         damage_plasma = e_user.GetPlasmaDamage();
         damage_gamma = e_user.GetGammaDamage();
+        damage_graviton = e_user.GetGravitonDamage();
         property_speedScale = e_user.GetBulletSpeedScale();
 
         property_bounces = e_user.GetBulletBounces();
@@ -127,6 +129,12 @@ public class BulletBehaviour : MonoBehaviour {
                 {
                     BVMInUse = visualParents[6];
                     visualParents[6].gameObject.SetActive(true);
+                    break;
+                }
+            case WeaponData.DamageElement.graviton:
+                {
+                    BVMInUse = visualParents[7];
+                    visualParents[7].gameObject.SetActive(true);
                     break;
                 }
         }
@@ -290,6 +298,9 @@ public class BulletBehaviour : MonoBehaviour {
         if (damage_nuclear > 0)
         {
             ObjectPool.currentInstance.GetExplosionFromPool().SetupExplosion(damage_nuclear, 1, Enums.DamageType.nuclearDamage, transform.position, entity_user);
+        }
+        if (damage_graviton > 0) {
+            ObjectPool.currentInstance.GetGravitonFromPool().SetupExplosion(damage_graviton, 1, transform.position, entity_user);
         }
         if (damage_gamma > 0)
         {

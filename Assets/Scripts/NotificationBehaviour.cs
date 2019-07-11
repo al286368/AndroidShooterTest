@@ -82,6 +82,11 @@ public class NotificationBehaviour : MonoBehaviour {
                     notificationText.color = Color.green;
                     break;
                 }
+            case Enums.DamageType.graviton:
+                {
+                    notificationText.color = Color.magenta;
+                    break;
+                }
         }
     }
 	// Update is called once per frame
